@@ -22,11 +22,9 @@ import { Subscription } from 'expo-sensors/build/Pedometer';
 
 import * as Location from 'expo-location';
 
-// Pull in the shims (BEFORE importing ethers)
-import "@ethersproject/shims"
 
-// Import the ethers library
-import { BigNumber, ethers } from "ethers";
+// Import the hethers library
+import { hethers } from '@hashgraph/hethers';
 
 import MyStack from './NavigationView';
 
@@ -78,7 +76,7 @@ function App(): JSX.Element {
     setAccelerationData({x:0,y:0,z:0})
   };
 
- const [wallet,setWallet] = React.useState<ethers.Wallet|undefined>()
+ const [wallet,setWallet] = React.useState<hethers.Wallet|undefined>()
  const [userKey,setUserKey] = React.useState<string>("")
 
   const [errorMsg, setErrorMsg] = React.useState<String>();
