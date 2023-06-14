@@ -1,5 +1,5 @@
 
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, hethers } from '@hashgraph/hethers';
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -22,11 +22,11 @@ export interface SetupProps{
 }*/
 type MainProps = NativeStackScreenProps<RootStackParamList, 'Main'>
 
-const provider = new ethers.providers.JsonRpcProvider("https://rpc2.sepolia.org/ ")
+const provider =  hethers.providers.getDefaultProvider('testnet');
 const MainDisplay = ({route,navigation}:MainProps) => {
 
     const [userkey,setUserKey,wallet,setWallet] = React.useContext(AuthContext);
-    const [balance,setBalance] = React.useState<BigNumber>(ethers.BigNumber.from(0));
+    const [balance,setBalance] = React.useState<BigNumber>(hethers.BigNumber.from(0));
     const [needPassword,setPassFlag] = React.useState<boolean>(true);
     const [pass,setPass] = React.useState<string>("")
     const [update,setUpdateFlag] = React.useState<boolean>(false)
@@ -40,7 +40,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
 
   const fetchDetail =async ()=>{
       if(update){
-        ethers.Wallet.fromEncryptedJson(userkey,
+        hethers.Wallet.fromEncryptedJson(userkey,
           pass,
           (currentProgress:number)=>{
               let rounded = Number.parseInt(""+(currentProgress*100))
@@ -48,7 +48,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
               console.log("Decrypting : "+rounded)
             }
           
-        ).then((newwallet:ethers.Wallet)=>{
+        ).then((newwallet:hethers.Wallet)=>{
           setWallet(newwallet)
           //wallet created
           setPassFlag(false)
