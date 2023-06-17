@@ -24,7 +24,7 @@ import * as Location from 'expo-location';
 
 
 // Import the hethers library
-import { hethers } from '@hashgraph/hethers';
+import { Wallet } from '@hashgraph/sdk';
 
 import MyStack from './NavigationView';
 
@@ -35,8 +35,8 @@ export interface GlobalState{
  
 export const AuthContext = React.createContext<[userKey:string,
   setUserKey: React.Dispatch<SetStateAction<string>> ,
-  wallet:ethers.Wallet|undefined,
-  setWallet:React.Dispatch<SetStateAction<ethers.Wallet|undefined>>]>(['',()=>undefined,undefined,()=>undefined]);
+  wallet:Wallet|undefined,
+  setWallet:React.Dispatch<SetStateAction<Wallet|undefined>>]>(['',()=>undefined,undefined,()=>undefined]);
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
@@ -76,7 +76,7 @@ function App(): JSX.Element {
     setAccelerationData({x:0,y:0,z:0})
   };
 
- const [wallet,setWallet] = React.useState<hethers.Wallet|undefined>()
+ const [wallet,setWallet] = React.useState<Wallet|undefined>()
  const [userKey,setUserKey] = React.useState<string>("")
 
   const [errorMsg, setErrorMsg] = React.useState<String>();

@@ -52,7 +52,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
           setWallet(newwallet)
           //wallet created
           setPassFlag(false)
-        wallet?.getBalance("latest").then((value:BigNumber)=>{
+        wallet?.getBalance().then((value:BigNumber)=>{
           //account balance
           setUpdateFlag(false)
           setBalance(value);

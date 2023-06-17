@@ -1,5 +1,5 @@
 
-import { ethers } from 'ethers';
+import { Wallet,Client } from '@hashgraph/sdk';
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -22,7 +22,7 @@ export interface SetupProps{
 type SetupProps = NativeStackScreenProps<RootStackParamList, 'Login'>
 
 
-const provider = new ethers.providers.JsonRpcProvider("https://rpc2.sepolia.org/ ")
+const provider = Client.forTestnet();
 const SetupDisplay = ({route,navigation}:SetupProps) => {
 
     const [pkey,setPkey] = React.useState<string>("");
@@ -59,7 +59,7 @@ const SetupDisplay = ({route,navigation}:SetupProps) => {
         if(pkey.length !=0 || pass.length<8){
           
           console.log("Loading "+loading)
-          const wallet = new ethers.Wallet(pkey,provider)
+          const wallet = new hethers.Wallet(pkey,provider)
           
           wallet.encrypt(pass,{scrypt: {
             // The number must be a power of 2 (default: 131072)
