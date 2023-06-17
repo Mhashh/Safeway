@@ -1,4 +1,6 @@
-import React, {  SetStateAction } from 'react';
+require('dotenv').config
+import * as React from 'react';
+import './shim.js';
 import {
   StyleSheet,
   Text,
@@ -24,7 +26,7 @@ import * as Location from 'expo-location';
 
 
 // Import the hethers library
-import { Wallet } from '@hashgraph/sdk';
+import { Wallet,AccountId,PrivateKey,Client } from '@hashgraph/sdk';
 
 import MyStack from './NavigationView';
 
@@ -37,7 +39,16 @@ export const AuthContext = React.createContext<[userKey:string,
   setUserKey: React.Dispatch<SetStateAction<string>> ,
   wallet:Wallet|undefined,
   setWallet:React.Dispatch<SetStateAction<Wallet|undefined>>]>(['',()=>undefined,undefined,()=>undefined]);
+
+
 function App(): JSX.Element {
+
+  // create your client
+  const myAccountId = AccountId.fromString(process.env.REACT_APP_MY_ACCOUNT_ID);
+  const myPrivateKey = PrivateKey.fromString(process.env.REACT_APP_MY_PRIVATE_KEY);
+
+  const client = Client.forTestnet();
+  client.setOperator(myAccountId, myPrivateKey);
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
     fontSize: 24,
@@ -121,6 +132,7 @@ function App(): JSX.Element {
 
 
   return (
+    
     <AuthContext.Provider  value={[userKey,setUserKey,wallet,setWallet]}>
         <MyStack ></MyStack>
     </AuthContext.Provider>
