@@ -1,5 +1,4 @@
 
-import { BigNumber, hethers } from '@hashgraph/hethers';
 import * as React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -22,67 +21,14 @@ export interface SetupProps{
 }*/
 type MainProps = NativeStackScreenProps<RootStackParamList, 'Main'>
 
-const provider =  hethers.providers.getDefaultProvider('testnet');
 const MainDisplay = ({route,navigation}:MainProps) => {
 
-    const [userkey,setUserKey,wallet,setWallet] = React.useContext(AuthContext);
-    const [balance,setBalance] = React.useState<BigNumber>(hethers.BigNumber.from(0));
-    const [needPassword,setPassFlag] = React.useState<boolean>(true);
-    const [pass,setPass] = React.useState<string>("")
+    const client= React.useContext(AuthContext);
+    const [balance,setBalance] = React.useState<Number>(0);
     const [update,setUpdateFlag] = React.useState<boolean>(false)
 
-    console.log("MAIN : "+userkey)
-    React.useEffect(()=>{
-      fetchDetail().then(()=>{
-        console.log("DONE")
-      })
-    },[update])
 
-  const fetchDetail =async ()=>{
-      if(update){
-        hethers.Wallet.fromEncryptedJson(userkey,
-          pass,
-          (currentProgress:number)=>{
-              let rounded = Number.parseInt(""+(currentProgress*100))
-            
-              console.log("Decrypting : "+rounded)
-            }
-          
-        ).then((newwallet:hethers.Wallet)=>{
-          setWallet(newwallet)
-          //wallet created
-          setPassFlag(false)
-        wallet?.getBalance().then((value:BigNumber)=>{
-          //account balance
-          setUpdateFlag(false)
-          setBalance(value);
-
-        }).catch(()=>{
-          //unable to fetch balance
-          Alert.alert('View Transaction failed', 'unable to get', [
-            {
-              text: 'ok',
-              onPress: () => {
-              }
-            }
-          ]);
-        }
-          
-        )
-      }).catch(()=>{
-        //wrong password
-        Alert.alert('Wrong password', 'please try again!', [
-          {
-            text: 'ok',
-            onPress: () => {
-              setPass('')
-              setUpdateFlag(false)
-            }
-          }
-        ]);
-      })
-    }
-  }
+  
 
     const verifyAndUpdate = ()=>{
       setUpdateFlag(true)
@@ -90,28 +36,10 @@ const MainDisplay = ({route,navigation}:MainProps) => {
 
     return (
       <View style={styles.screen}>
-        {needPassword?
-          <View style={styles.passcontainer}>
-          <TextInput editable
-          multiline numberOfLines={1}
-                  maxLength={16}
-                  onChange={text => {
-                    
-                    setPass(text.nativeEvent.text)
-                  
-                  }
-                  }
-                  style={styles.inputP}  value={pass}
-        ></TextInput>
-        <TouchableOpacity style={styles.button} onPress={ verifyAndUpdate}>
-        <Text>Press Here</Text>
-      </TouchableOpacity></View>
-        :  
+        
         <Text style={styles.input}>
           Address : {balance.toString()}
         </Text>
-        
-      }
       </View>
     );
   }

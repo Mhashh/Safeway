@@ -1,7 +1,7 @@
-import Mapbox from '@rnmapbox/maps';
+import Mapbox,{MapView} from '@rnmapbox/maps';
 import { Position } from '@rnmapbox/maps/lib/typescript/types/Position';
-import React from 'react';
-import {NativeStackNavigationProp,} from '@react-navigation/native-stack';
+import * as React from 'react';
+
 import {
   Button,
   GestureResponderEvent,
@@ -15,6 +15,8 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../NavigationView';
 import * as Location from 'expo-location';
+
+
 Mapbox.setWellKnownTileServer('Mapbox');
 Mapbox.setAccessToken('pk.eyJ1IjoiNG1haHNoIiwiYSI6ImNsaTR2dnFodzBzOGwzZm85bjVuaXE1aXgifQ.agRRGDJNR4PR49RIQ3nmWg');
 
@@ -91,7 +93,6 @@ type MapProps = NativeStackScreenProps<RootStackParamList, 'Map'>
       <TouchableOpacity activeOpacity={1} onLongPress={someOneMarked}>
       <View style={styles.page}>
         <View style={styles.container}>
-          
             <Mapbox.MapView ref={map} style={styles.map}>
               
               <Mapbox.Camera ref={camera} minZoomLevel={8} maxZoomLevel={15} />
