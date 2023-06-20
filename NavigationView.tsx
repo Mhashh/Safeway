@@ -21,18 +21,11 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
  
 
 const MyStack = () => {
-  const [userkey,setUserKey,loading,setLoadFlag] = React.useContext(AuthContext)
+  const client = React.useContext(AuthContext)
   return (
     <NavigationContainer>
       
-        {userkey === '' ?
-        <Stack.Navigator>
-        <Stack.Screen
-          name="Login"
-          component={SetupDisplay}
-          initialParams={{  }}
-        /></Stack.Navigator>
-        :
+        
         <Stack.Navigator>
         <Stack.Screen
           name="Main"
@@ -46,9 +39,7 @@ const MyStack = () => {
         />
 
         </Stack.Navigator>
-        }
         
-      
     </NavigationContainer>
     
   );

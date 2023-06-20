@@ -1,6 +1,6 @@
 
 import { BigNumber, hethers } from '@hashgraph/hethers';
-import React from 'react';
+import * as React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Alert,
