@@ -11,14 +11,11 @@ import {
 
 import {
   Colors,
-  DebugInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
 import {
   Accelerometer,
 } from 'expo-sensors';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Subscription } from 'expo-sensors/build/Pedometer';
 
@@ -35,10 +32,7 @@ export interface GlobalState{
   signedIn:boolean,
 }
  
-export const AuthContext = React.createContext<[userKey:string,
-  setUserKey: React.Dispatch<SetStateAction<string>> ,
-  wallet:Wallet|undefined,
-  setWallet:React.Dispatch<SetStateAction<Wallet|undefined>>]>(['',()=>undefined,undefined,()=>undefined]);
+export const AuthContext = React.createContext<Client>(undefined);
 
 
 function App(): JSX.Element {
@@ -62,16 +56,7 @@ function App(): JSX.Element {
   
   let text : String = 'Waiting..';
 
-  //check local db for credentials
-  const getData = async () :Promise<string |null  | undefined> => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('SECRET')
-      console.log(jsonValue)
-      return jsonValue != null ? jsonValue : null;
-    } catch(e) {
-      // error reading value
-    }
-  }
+  
 
 
   
@@ -87,8 +72,6 @@ function App(): JSX.Element {
     setAccelerationData({x:0,y:0,z:0})
   };
 
- const [wallet,setWallet] = React.useState<Wallet|undefined>()
- const [userKey,setUserKey] = React.useState<string>("")
 
   const [errorMsg, setErrorMsg] = React.useState<String>();
 
@@ -101,16 +84,6 @@ function App(): JSX.Element {
  
   const [subscription, setSubscription] = React.useState<Subscription>();
 
-
-  React.useEffect(()=>{
-    console.log("APP>START>useeffect")
-     getData().then((value)=>{
-      console.log(",[encryptedWallet ] : "+value)
-        if(value!== undefined && value!= null){
-          setUserKey(value);
-        }
-     })
-  },[])
 
   React.useEffect(() => {
     (async () => {
@@ -133,7 +106,7 @@ function App(): JSX.Element {
 
   return (
     
-    <AuthContext.Provider  value={[userKey,setUserKey,wallet,setWallet]}>
+    <AuthContext.Provider  value={client}>
         <MyStack ></MyStack>
     </AuthContext.Provider>
         
