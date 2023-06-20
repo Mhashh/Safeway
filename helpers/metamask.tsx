@@ -1,31 +1,18 @@
-export const switchToHederaNetwork = async (ethereum: any) => {
-    try {
-      await ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x128' }] // chainId must be in hexadecimal numbers
-      });
-    } catch (error: any) {
-      if (error.code === 4902) {
-        try {
-          await ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainName: 'Hedera Testnet',
-                chainId: '0x128',
-                nativeCurrency: {
-                  name: 'HBAR',
-                  symbol: 'HBAR',
-                  decimals: 18
-                },
-                rpcUrls: ['https://testnet.hashio.io/api']
-              },
-            ],
-          });
-        } catch (addError) {
-          console.error(addError);
-        }
-      }
-      console.error(error);
-    }
-  }
+import MetaMaskSDK from '@metamask/sdk';
+import { Linking } from 'react-native';
+import BackgroundTimer from 'react-native-background-timer';
+
+const MMSDK = new MetaMaskSDK({
+  openDeeplink: (link) => {
+    Linking.openURL(link); // Use React Native Linking method or another way of opening deeplinks.
+  },
+  timer: BackgroundTimer, // To keep the dapp alive once it goes to background.
+  dappMetadata: {
+    name: 'Safeway', // The name of your dapp.
+    url: 'https://mydapp.com', // The URL of your website.
+  },
+});
+
+const ethereum = MMSDK.getProvider();
+
+export default ethereum;
