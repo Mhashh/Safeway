@@ -1,8 +1,7 @@
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import MapDisplay from './userscreens/MapDisplay';
-import SetupDisplay from './userscreens/setup';
+//import MapDisplay from './userscreens/MapDisplay';
 import { AuthContext } from './App';
 import MainDisplay from './userscreens/Main';
 
@@ -30,11 +29,6 @@ const MyStack = () => {
         <Stack.Screen
           name="Main"
           component={MainDisplay}
-          initialParams={{  }}
-        />
-        <Stack.Screen
-          name="Map"
-          component={MapDisplay}
           initialParams={{  }}
         />
 

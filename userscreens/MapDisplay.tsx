@@ -1,4 +1,4 @@
-import Mapbox,{MapView} from '@rnmapbox/maps';
+/*import Mapbox,{MapView} from '@rnmapbox/maps';
 import { Position } from '@rnmapbox/maps/lib/typescript/types/Position';
 import * as React from 'react';
 
@@ -178,7 +178,7 @@ type MapProps = NativeStackScreenProps<RootStackParamList, 'Map'>
     }
   });
 
-  /*
+  
    {markers.length>0 &&
                 markers.map((item,index)=>{
                   console.log(index)

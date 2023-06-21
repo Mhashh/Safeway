@@ -1,6 +1,7 @@
-require('dotenv').config
-import * as React from 'react';
 import './shim.js';
+import Constants  from 'expo-constants';
+import * as React from 'react';
+
 import {
   StyleSheet,
   Text,
@@ -38,8 +39,8 @@ export const AuthContext = React.createContext<Client>(undefined);
 function App(): JSX.Element {
 
   // create your client
-  const myAccountId = AccountId.fromString(process.env.REACT_APP_MY_ACCOUNT_ID);
-  const myPrivateKey = PrivateKey.fromString(process.env.REACT_APP_MY_PRIVATE_KEY);
+  const myAccountId = AccountId.fromString(Constants.expoConfig.extra.REACT_APP_MY_ACCOUNT_ID);
+  const myPrivateKey = PrivateKey.fromString(Constants.expoConfig.extra.REACT_APP_MY_PRIVATE_KEY);
 
   const client = Client.forTestnet();
   client.setOperator(myAccountId, myPrivateKey);
@@ -94,6 +95,7 @@ function App(): JSX.Element {
         setErrorMsg('Permission to access location was denied');
         return;
       }
+      _subscribe();
         
       }
       catch(exception){

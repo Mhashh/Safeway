@@ -25,6 +25,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra":{
+      "REACT_APP_MY_ACCOUNT_ID":"0.0.14078357",
+      "REACT_APP_MY_PRIVATE_KEY":"0xdc438f169d612901572841567cae63ce6e270b3b3c49e0fdc6485496f5fdebbd"
     }
   }
 }

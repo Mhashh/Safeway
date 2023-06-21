@@ -13,6 +13,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../NavigationView';
 import { AuthContext } from '../App'
+import { connectToMetaMask } from '../helpers/ChainHelpers';
 
 /*
 export interface SetupProps{
@@ -27,6 +28,17 @@ const MainDisplay = ({route,navigation}:MainProps) => {
     const [balance,setBalance] = React.useState<Number>(0);
     const [update,setUpdateFlag] = React.useState<boolean>(false)
 
+    React.useEffect(()=>{
+      connectToMetaMask().then((value)=>{
+        console.log(value);
+
+
+
+        
+      }).catch((err)=>{
+        console.log(err);
+      });
+    },[])
 
   
 
