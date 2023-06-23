@@ -6,7 +6,7 @@ import Constants  from 'expo-constants';
 const myAccountId = AccountId.fromString(Constants.;
 const myPrivateKey = PrivateKey.fromString(Constants.expoConfig.extra.REACT_APP_MY_PRIVATE_KEY);
 
-const client = Client.forTestnet();
+export const client = Client.forTestnet();
 client.setOperator(myAccountId, myPrivateKey);
 
 export interface NewAccount {
@@ -16,7 +16,7 @@ export interface NewAccount {
 }
 
 
-exports .createNewAccount = async () : Promise<NewAccount> =>{
+export const createNewAccount = async () : Promise<NewAccount> =>{
 let stringKey = "";
 Mnemonic.generate12().then((value:Mnemonic)=>{
     stringKey  = value.toString();
@@ -49,14 +49,31 @@ Mnemonic.generate12().then((value:Mnemonic)=>{
     })
 throw new Error("Key generation failed.");
 }
-exports.getBalance =async (accid:string):Promise<AccountBalance> => {
+export const getBalance =async (accid:string):Promise<AccountBalance> => {
     const query = new AccountBalanceQuery().setAccountId(accid);
 
     const balance = await query.execute(client);
     return balance;
 }
 
-exports .getAccountClient = async (privateKey:string,accid:string) : Promise<Client> =>{
+//uses 12 word string as input 
+export const getAccountClientM = async (memonic:string,accid:string) : Promise<Client> =>{
+    try{  
+        let privateKey = Mnemonic.fromString(memonic)..toStandardEd25519PrivateKey();
+        let userClient = Client.forTestnet();
+        userClient.setOperator(accid,privateKey);
+        
+        return userClient;
+    
+    //v2.0.5
+    }
+    catch(error){
+        throw new Error("Client generation failed.");
+    }
+}
+
+//uses key string as input 
+export const getAccountClientP = async (privateKey:string,accid:string) : Promise<Client> =>{
     try{  
         let userClient = Client.forTestnet();
         userClient.setOperator(accid,privateKey);
@@ -68,7 +85,5 @@ exports .getAccountClient = async (privateKey:string,accid:string) : Promise<Cli
     catch(error){
         throw new Error("Client generation failed.");
     }
-    }
-
-  exports.client = client;
+}
   
