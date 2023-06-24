@@ -16,7 +16,7 @@ export default function Login({route,navigation}:LoginProps){
     const [accid,setAcc] = React.useState<string>("")
     const [pkey,setPkey] = React.useState<string>("")
     const [created,setCreateFlag ] = React.useState<boolean>(false);
-    const {client,setClient,useracc,setUserAcc} = React.useContext(AuthContext)
+    const {setClient,setUserAcc,setAddr} = React.useContext(AuthContext)
 
     //12 word key string states
 
@@ -48,19 +48,24 @@ export default function Login({route,navigation}:LoginProps){
             setJ(newkey[9]);
             setK(newkey[10]);
             setL(newkey[11]);
-            setAcc(value.accid);
-            setCreateFlag(true);
+            setAcc(value.accid);            
             setUserAcc(accid);
-            setTimeout(()=>{
-                
-            },40000)
+            setPkey(value.privatekey)
+            setAddr(value.address)
+            setCreateFlag(true);
+            console.log(accid+"  ,  "+value.keystring+"  ,  "+pkey)
+        }).catch((err)=>{
+            console.log(err)
         })
     }
     const oldUser = () =>{
-        let wordString = a+b+c+d+e+f+g+h+i+j+k+l
+        let wordString = a+" "+b+" "+c+" "+d+" "+e+" "+f+" "+g+" "+h+" "+i+" "+j+" "+k+" "+l
         setUserAcc(accid);
-        getAccountClientM(wordString,accid).then((newclient)=>{
+        getAccountClientM(wordString,accid).then(({newclient,address})=>{
+            setAddr(address)
             setClient(newclient);
+        }).catch((err)=>{
+            console.log(err)
         })
     }
 
@@ -137,18 +142,21 @@ export default function Login({route,navigation}:LoginProps){
             {(created||loginType)&&<View style={styles.middlebox}>
                     <TextInput style={styles.inputbox}
                         placeholder="Enter Account id here"
-                        onChangeText={_newText =>{if(!created) setAcc(accid)}}
+                        onChangeText={newText =>{if(!created) setAcc(newText)}}
+                        value={accid}
                     ></TextInput>
                 </View>
             }{created?<View style={styles.buttons}>
                     <Pressable onPress={()=>{
-                        setPageType(false);
-                        setCreateFlag(false);
+                        
                         
                         getAccountClientP(pkey,accid).then((newclient)=>{
                             setClient(newclient);
+                        }).catch((err)=>{
+                            console.log(err)
                         });
-
+                        setPageType(false);
+                        setCreateFlag(false);
                         setPkey("");
                         setAcc("");
                         

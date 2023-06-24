@@ -3,10 +3,12 @@ import React from "react";
 import { LatLng } from "react-native-maps";
 
 export type GlobalState = {
-    client:Client,
+    userclient:Client,
     setClient:React.Dispatch<React.SetStateAction<Client>>,
     useracc:string,
-    setUserAcc:React.Dispatch<React.SetStateAction<string>>
+    setUserAcc:React.Dispatch<React.SetStateAction<string>>,
+    userAddress:string,
+    setAddr:React.Dispatch<React.SetStateAction<string>>
   }
 
   export type RootStackParamList = {
