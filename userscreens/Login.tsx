@@ -1,76 +1,147 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { RootStackParamList } from "../NavigationView"
-import { Text,TextInput, TouchableOpacity, View,StyleSheet, StyleProp, Pressable} from "react-native"
-import React, { ReactElement } from "react"
+import { RootStackParamList } from "../helpers/AuthContext"
+import { Text,TextInput, View,StyleSheet, Pressable, NativeSyntheticEvent, TextInputEndEditingEventData, TextInputChangeEventData} from "react-native"
+import React from "react"
 import { NewAccount, createNewAccount, getAccountClientM, getAccountClientP } from "../helpers/DevClient"
-import { AuthContext } from "../App"
+import { AuthContext } from "../helpers/AuthContext"
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>
-type InputProps = {textValues:string[],dontchange:boolean,index:number} 
-const TextRow = ({textValues,index,dontchange}:InputProps)=>{
 
-    let list:ReactElement[] = [];
-    for(let i = index;i<(index+4);i++){
-        list.push(<TextInput style={styles.inputbox}
-            placeholder=""
-            onChangeText={newText => {if(!dontchange){textValues[i] = newText}}}
-            defaultValue={textValues[i]}
-        ></TextInput>)
-    }
-    return(
-        <View style={styles.textbox}>
-            {list}
-        </View>
-    )
- }
 
-const Login = ({route,navigation}:LoginProps):JSX.Element=>{
 
-    const [loginType,setPageType]= React.useState<boolean>(false);
-    const [memonic,setMemonic] = React.useState<string[]>(["","","","","","","","","","","",""]);
+export default function Login({route,navigation}:LoginProps){
+
+    const [loginType,setPageType]= React.useState<boolean>(true);
+    
     const [accid,setAcc] = React.useState<string>("")
     const [pkey,setPkey] = React.useState<string>("")
     const [created,setCreateFlag ] = React.useState<boolean>(false);
-    const {client,setClient} = React.useContext(AuthContext)
+    const {client,setClient,useracc,setUserAcc} = React.useContext(AuthContext)
+
+    //12 word key string states
+
+    const[a,setA] = React.useState<string>("")
+    const[b,setB] = React.useState<string>("")
+    const[c,setC] = React.useState<string>("")
+    const[d,setD] = React.useState<string>("")
+    const[e,setE] = React.useState<string>("")
+    const[f,setF] = React.useState<string>("")
+    const[g,setG] = React.useState<string>("")
+    const[h,setH] = React.useState<string>("")
+    const[i,setI] = React.useState<string>("")
+    const[j,setJ] = React.useState<string>("")
+    const[k,setK] = React.useState<string>("")
+    const[l,setL] = React.useState<string>("")
 
     const newUser = ()=>{
         createNewAccount().then((value:NewAccount)=>{
-            setMemonic(value.keystring.split(" "));
+            const newkey = value.keystring.split(" ")
+            setA(newkey[0]);
+            setB(newkey[1]);
+            setC(newkey[2]);
+            setD(newkey[3]);
+            setE(newkey[4]);
+            setF(newkey[5]);
+            setG(newkey[6]);
+            setH(newkey[7]);
+            setI(newkey[8]);
+            setJ(newkey[9]);
+            setK(newkey[10]);
+            setL(newkey[11]);
             setAcc(value.accid);
             setCreateFlag(true);
+            setUserAcc(accid);
             setTimeout(()=>{
                 
             },40000)
         })
     }
     const oldUser = () =>{
-        let wordString = memonic.join(" ")
-
+        let wordString = a+b+c+d+e+f+g+h+i+j+k+l
+        setUserAcc(accid);
         getAccountClientM(wordString,accid).then((newclient)=>{
             setClient(newclient);
         })
     }
-    return 
-    (
+
+
+    return(
         <View style={styles.outerbox}>
-            if(created||loginType){
-                <View style={styles.upperbox}>
-                    <TextRow textValues={memonic} index={0} dontchange={created}></TextRow>
-                    <TextRow textValues={memonic} index={4} dontchange={created}></TextRow>
-                    <TextRow textValues={memonic} index={8} dontchange={created}></TextRow>
+            {(created||loginType)&&<View style={styles.upperbox}><View style={styles.textbox}>
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={a}
+                            onChangeText={setA}
+                        />
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={b}
+                            onChangeText={setB}
+                        />
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={c}
+                            onChangeText={setC}
+                        />
+                    </View><View style={styles.textbox}>
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={d}
+                            onChangeText={setD}
+                        />
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={e}
+                            onChangeText={setE}
+                        />
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={f}
+                            onChangeText={setF}
+                        />
+                    </View><View style={styles.textbox}>
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={g}
+                            onChangeText={setG}
+                        />
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={h}
+                            onChangeText={setH}
+                        />
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={i}
+                            onChangeText={setI}
+                        />
+                    </View><View style={styles.textbox}>
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={j}
+                            onChangeText={setJ}
+                        />
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={k}
+                            onChangeText={setK}
+                        />
+                        <TextInput style={styles.inputbox}
+                            placeholder="12 word key"
+                            value={l}
+                            onChangeText={setL}
+                        />
+                    </View>
                 </View>
             }
-            if(created||loginType){
-                <View style={styles.middlebox}>
+            {(created||loginType)&&<View style={styles.middlebox}>
                     <TextInput style={styles.inputbox}
-                        placeholder=""
-                        onChangeText={newText =>{if(!created) setAcc(accid)}}
-                        defaultValue={accid}
+                        placeholder="Enter Account id here"
+                        onChangeText={_newText =>{if(!created) setAcc(accid)}}
                     ></TextInput>
                 </View>
-            }{created?
-                <View style={styles.buttons}>
-                <Pressable onPress={()=>{
+            }{created?<View style={styles.buttons}>
+                    <Pressable onPress={()=>{
                         setPageType(false);
                         setCreateFlag(false);
                         
@@ -80,51 +151,74 @@ const Login = ({route,navigation}:LoginProps):JSX.Element=>{
 
                         setPkey("");
                         setAcc("");
-                        setMemonic(["","","","","","","","","","","",""])
-                    }}>
-                    <Text>{loginType?"Enter keys ":"Create keys"}</Text>
-                </Pressable>
-                </View>
-            
+                        
+                        setA("");
+                        setB("");
+                        setC("");
+                        setD("");
+                        setE("");
+                        setF("");
+                        setG("");
+                        setH("");
+                        setI("");
+                        setJ("");
+                        setK("");
+                        setL("");
+                    }}><Text>{loginType==true?"Enter keys ":"Create keys"}</Text></Pressable></View>
                 :<View style={styles.buttons}>
-                <Pressable onPress={loginType?oldUser:newUser}>
-                    <Text>{loginType?"Enter keys ":"Create keys"}</Text>
-                </Pressable>
-                <Pressable onPress={()=>setPageType(!loginType)}>
-                    <Text>
-                        {loginType?"Create new keys ?":"Already have an hedera account"}
-                    </Text>
-                </Pressable>
+                <Pressable onPress={loginType?oldUser:newUser}><Text style={styles.textbutton}>{loginType ==true?"Enter keys ":"Create keys"}</Text></Pressable>
+                <Pressable onPress={()=>setPageType(!loginType)}><Text style={styles.alternatebutton}>{loginType==true?"Create new keys ?":"Already have an hedera account"}</Text></Pressable>
                 </View>
             }
         </View>
     );
 }
-export default Login;
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     outerbox:{
-        flexDirection:'row',
+        flexDirection:'column',
         height:'100%',
         width:'100%',
-        alignItems:"center",
+        alignItems:"center"
     },
     upperbox:{
-        flex:4
+        marginTop:20,
+        flex:5,
+        flexDirection:'column',
+        alignItems:'baseline',
     },
     middlebox:{
-        flex:1
+        flex:1,
     },
     textbox:{
         flex:1,
-        flexDirection:'column',
-        padding:10,
+        flexDirection:'row',
     },
     inputbox:{
         flex:1,
+        height:'50%',
+        width:'60%',        
+        textAlign:'center',
+        margin:10,
+        borderBottomColor:'black',
+        borderBottomWidth:1,
     },
     buttons:{
-        flex:2
+        flex:5,
+        alignItems:'center'
+    },
+    textbutton:{
+        fontSize:18,
+        padding:10,
+        marginTop:10,
+        marginBottom:10,
+        color:'white',
+        backgroundColor:'green',
+        borderRadius:10
+    },
+    alternatebutton:{
+        fontSize:15,
+        color:'blue'
     }
 
 })
