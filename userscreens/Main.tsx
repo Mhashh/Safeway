@@ -34,7 +34,7 @@ const UserContractItem = ({_id,ownerid,city,country,alertid,mapid}: UserContract
 );
 const MainDisplay = ({route,navigation}:MainProps) => {
   
-    const {userclient,userAddress}= React.useContext(AuthContext);
+    const {userclient,useracc,userAddress}= React.useContext(AuthContext);
     const [balance,setBalance] = React.useState<string>("0");
     const [userContracts,setUC] = React.useState<UserContractList[]>();
 
@@ -46,7 +46,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          owner:userAddress
+          owner:useracc
         }),
       })
       const res= await webres.json();
@@ -55,9 +55,9 @@ const MainDisplay = ({route,navigation}:MainProps) => {
       console.log(userContracts)
     }
     React.useEffect(()=>{
-      if(userAddress!=="" ){
-        getBalance(userAddress).then((bal)=>{
-          setBalance(balance)
+      if(useracc!=="" ){
+        getBalance(useracc).then((bal)=>{
+          setBalance(bal.hbars.toBigNumber().toString()+" hbars")
         });
         getUserContractList()
         
@@ -67,12 +67,12 @@ const MainDisplay = ({route,navigation}:MainProps) => {
     return (
       <View style={styles.screen} ><View style={styles.topbar}>
           <Text style={styles.inputB}>
-            Balance : {balance}{'\n'}<Text style={styles.inputA}>Address: {userAddress}</Text> 
+            Balance : {balance}{'\n'}<Text style={styles.inputA}>Address: {useracc}</Text> 
           </Text>
           <Pressable onPress={(ev)=>{
             getUserContractList();
-            getBalance(userAddress).then((bal)=>{
-              setBalance(balance)
+            getBalance(useracc).then((bal)=>{
+              setBalance(bal.hbars.toBigNumber().toString()+" hbars")
             });
           }}><Text style={styles.inputC}>Refresh</Text></Pressable>
       </View>
