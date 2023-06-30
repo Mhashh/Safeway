@@ -3,8 +3,11 @@ import {client} from './DevClient';
 import { Alert } from 'react-native';
 import { BigNumber } from '@hashgraph/sdk/lib/Transfer';
 import { LatLng } from 'react-native-maps';
+import Constants from 'expo-constants';
 
-const mainContractId = "";
+const mainContractId = Constants.expoConfig.extra.mainContractId
+const roadMapFileId= Constants.expoConfig.extra.roadMapFileId
+const roadAlertFileId= Constants.expoConfig.extra.roadAlertFileId
 
 //dialog box before any query showing cost
 const showAlert = (header:string,detail:string) : Promise<boolean>=>{
@@ -37,7 +40,7 @@ const showAlert = (header:string,detail:string) : Promise<boolean>=>{
     )
 }
 
-export const viewcost = async(newContractId:string,userClient:Client):Promise<string>=>{
+export const viewcost = async(newContractId:string,userClient:Client):Promise<BigNumber>=>{
 
     //Create the contract query
     const query = new ContractCallQuery()
@@ -51,8 +54,8 @@ export const viewcost = async(newContractId:string,userClient:Client):Promise<st
 
     //Get the transaction consensus status
     const amt = response.getUint256(0);
-    const amth = Hbar.from(amt,HbarUnit.Tinybar).toString();
-    return amth;
+    const amth = Hbar.fromTinybars(amt)
+    return amth.toBigNumber();
 }
 
 export const hits = async(newContractId:string,userClient:Client):Promise<number>=>{
@@ -174,10 +177,10 @@ export const viewMarkers = async(newContractId:string,price:number,userClient:Cl
 
     //Create the query
     const query = new ContractExecuteTransaction()
-    .setContractId(mainContractId)
+    .setContractId(newContractId)
     .setGas(100_000_000)
     .setFunction("set_message")
-    .setPayableAmount(new Hbar(price));
+    .setPayableAmount(price);
 
     const accept =  await showAlert("Adding new map region","Estimated cost : "+price.toString()+" hbar and 0.05$");
 

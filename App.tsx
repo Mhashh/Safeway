@@ -1,7 +1,5 @@
-import './shim.js';
-import Constants  from 'expo-constants';
-import * as React from 'react';
 
+import * as React from 'react';
 import {
   StyleSheet,
   Text,
@@ -14,36 +12,17 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 
-import {
-  Accelerometer,
-} from 'expo-sensors';
-
-import { Subscription } from 'expo-sensors/build/Pedometer';
 
 import * as Location from 'expo-location';
 
 
-// Import the hethers library
-import { Wallet,AccountId,PrivateKey,Client } from '@hashgraph/sdk';
-
 import MyStack from './NavigationView';
 
-export interface GlobalState{
-  account:string,
-  signedIn:boolean,
-}
- 
-export const AuthContext = React.createContext<Client>(undefined);
 
 
 function App(): JSX.Element {
 
-  // create your client
-  const myAccountId = AccountId.fromString(Constants.expoConfig.extra.REACT_APP_MY_ACCOUNT_ID);
-  const myPrivateKey = PrivateKey.fromString(Constants.expoConfig.extra.REACT_APP_MY_PRIVATE_KEY);
 
-  const client = Client.forTestnet();
-  client.setOperator(myAccountId, myPrivateKey);
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
     fontSize: 24,
@@ -51,51 +30,26 @@ function App(): JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  //provider and signer
-  
-  
-  
-  let text : String = 'Waiting..';
-
-  
-
-
-  
-  const _subscribe = () => {
-    setSubscription(
-      Accelerometer.addListener(setAccelerationData)
-    );
-  };
-
-  const _unsubscribe = () => {
-    subscription && subscription.remove();
-    setSubscription(undefined);
-    setAccelerationData({x:0,y:0,z:0})
-  };
-
 
   const [errorMsg, setErrorMsg] = React.useState<String>();
 
-  const [ { x, y, z } ,setAccelerationData ] = React.useState({
-    x:0,
-    y:0,
-    z:0,
-  })
+  
 
  
-  const [subscription, setSubscription] = React.useState<Subscription>();
+  
 
 
   React.useEffect(() => {
+    
     (async () => {
       try{
+        console.log("ONNNNNNNN")
       let { status } = await Location.requestForegroundPermissionsAsync();
       console.log("STATUS : "+status)
       if (status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
         return;
       }
-      _subscribe();
         
       }
       catch(exception){
@@ -108,9 +62,8 @@ function App(): JSX.Element {
 
   return (
     
-    <AuthContext.Provider  value={client}>
+        
         <MyStack ></MyStack>
-    </AuthContext.Provider>
         
   );
 }

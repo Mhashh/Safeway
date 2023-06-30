@@ -13,25 +13,25 @@ export default function Login({route,navigation}:LoginProps){
 
     const [loginType,setPageType]= React.useState<boolean>(true);
     
-    const [accid,setAcc] = React.useState<string>("")
+    const [accid,setAcc] = React.useState<string>("0.0.14978202")
     const [pkey,setPkey] = React.useState<string>("")
     const [created,setCreateFlag ] = React.useState<boolean>(false);
     const {setClient,setUserAcc,setAddr} = React.useContext(AuthContext)
 
     //12 word key string states
 
-    const[a,setA] = React.useState<string>("")
-    const[b,setB] = React.useState<string>("")
-    const[c,setC] = React.useState<string>("")
-    const[d,setD] = React.useState<string>("")
-    const[e,setE] = React.useState<string>("")
-    const[f,setF] = React.useState<string>("")
-    const[g,setG] = React.useState<string>("")
-    const[h,setH] = React.useState<string>("")
-    const[i,setI] = React.useState<string>("")
-    const[j,setJ] = React.useState<string>("")
-    const[k,setK] = React.useState<string>("")
-    const[l,setL] = React.useState<string>("")
+    const[a,setA] = React.useState<string>("dash")
+    const[b,setB] = React.useState<string>("bar")
+    const[c,setC] = React.useState<string>("dinner")
+    const[d,setD] = React.useState<string>("time")
+    const[e,setE] = React.useState<string>("spirit")
+    const[f,setF] = React.useState<string>("gesture")
+    const[g,setG] = React.useState<string>("globe")
+    const[h,setH] = React.useState<string>("wash")
+    const[i,setI] = React.useState<string>("since")
+    const[j,setJ] = React.useState<string>("awkward")
+    const[k,setK] = React.useState<string>("sweet")
+    const[l,setL] = React.useState<string>("fade")
 
     const newUser = ()=>{
         createNewAccount().then((value:NewAccount)=>{
@@ -152,26 +152,27 @@ export default function Login({route,navigation}:LoginProps){
                         
                         getAccountClientP(pkey,accid).then((newclient)=>{
                             setClient(newclient);
+                            setPageType(false);
+                            setCreateFlag(false);
+                            setPkey("");
+                            setAcc("");
+                            
+                            setA("");
+                            setB("");
+                            setC("");
+                            setD("");
+                            setE("");
+                            setF("");
+                            setG("");
+                            setH("");
+                            setI("");
+                            setJ("");
+                            setK("");
+                            setL("");
                         }).catch((err)=>{
                             console.log(err)
                         });
-                        setPageType(false);
-                        setCreateFlag(false);
-                        setPkey("");
-                        setAcc("");
                         
-                        setA("");
-                        setB("");
-                        setC("");
-                        setD("");
-                        setE("");
-                        setF("");
-                        setG("");
-                        setH("");
-                        setI("");
-                        setJ("");
-                        setK("");
-                        setL("");
                     }}><Text>{loginType==true?"Enter keys ":"Create keys"}</Text></Pressable></View>
                 :<View style={styles.buttons}>
                 <Pressable onPress={loginType?oldUser:newUser}><Text style={styles.textbutton}>{loginType ==true?"Enter keys ":"Create keys"}</Text></Pressable>

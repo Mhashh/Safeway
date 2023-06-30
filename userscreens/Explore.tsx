@@ -1,14 +1,11 @@
 
 import * as React from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  Alert,
   FlatList,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -17,7 +14,7 @@ import { AuthContext, RootStackParamList } from '../helpers/AuthContext';
 import { apiGetC, getBalance, uri } from '../helpers/DevClient';
 
 
-type MainProps = NativeStackScreenProps<RootStackParamList, 'Main'>
+type ExploreProps = NativeStackScreenProps<RootStackParamList, 'Explore'>
 type UserContractList = {
   _id:string,
   ownerid:string,
@@ -32,9 +29,11 @@ const UserContractItem = ({_id,ownerid,city,country,alertid,mapid}: UserContract
     <Text style={styles.items}>{mapid} {alertid} {city} { country}</Text>
   </View>
 );
-const MainDisplay = ({route,navigation}:MainProps) => {
+const Explore = ({route,navigation}:ExploreProps) => {
   
     const {userclient,useracc,userAddress}= React.useContext(AuthContext);
+    const [city,setCity] = React.useState<string>()
+    const [country,setCountry] = React.useState<string>()
     const [balance,setBalance] = React.useState<string>("0");
     const [userContracts,setUC] = React.useState<UserContractList[]>();
 
@@ -46,7 +45,8 @@ const MainDisplay = ({route,navigation}:MainProps) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          owner:useracc
+          city:useracc,
+          country:country
         }),
       })
       const res= await webres.json();
@@ -65,7 +65,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
     },[]);
 
     return (
-      <View style={styles.screen} ><View style={styles.topbar}>
+      <View style={styles.screen}><View style={styles.topbar}>
           <Text style={styles.inputB}>
             Balance : {balance}{'\n'}<Text style={styles.inputA}>Address: {useracc}</Text> 
           </Text>
@@ -75,7 +75,28 @@ const MainDisplay = ({route,navigation}:MainProps) => {
               setBalance(bal.hbars.toBigNumber().toString()+" hbars")
             });
           }}><Text style={styles.inputC}>Refresh</Text></Pressable>
-      </View>
+      </View><View style={styles.lowercontainer}><View style={styles.inputB}>
+             <TextInput style={styles.inputbox}
+                placeholder="city name"
+                value={city}
+                onChangeText={setCity}
+            />
+          <TextInput style={styles.inputbox}
+                placeholder="country name"
+                value={country}
+                onChangeText={setCountry}
+            />
+            </View>
+          <Pressable 
+            style={styles.inputC}
+            onPress={()=>{
+                getUserContractList();
+                }
+            }  ><Text >
+                search
+            </Text>
+          </Pressable>
+        </View>
           
       <View style={styles.middlecontainer}>
       <FlatList
@@ -84,20 +105,19 @@ const MainDisplay = ({route,navigation}:MainProps) => {
           
             keyExtractor={item => item._id}
           ></FlatList>
-      </View><View style={styles.lowercontainer}>
-      <Pressable  style={styles.textbutton} onPress={(ev)=>{navigation.navigate("AddContracts")}}><Text  style={styles.txtbuttton}>Add new map</Text></Pressable>
-      <Pressable  style={styles.textbutton} onPress={(ev)=>{navigation.navigate("Explore")}}><Text style={styles.txtbuttton}>See other</Text></Pressable></View>
-        
+      </View>      
         
       </View>
     );
   }
   
-  export default MainDisplay;
+  export default Explore;
 
   const styles = StyleSheet.create({
     screen: {
       flexDirection:'column',
+      justifyContent: 'center',
+      alignItems: 'center',
       backgroundColor:'white',
       height:'100%',
         width:'100%',
@@ -111,6 +131,25 @@ const MainDisplay = ({route,navigation}:MainProps) => {
       borderLeftColor:'black',
       borderWidth:2,
       padding:6
+    },
+    inputbox:{
+        flex:3,
+        width:'100%',
+        color:'white',
+        backgroundColor:'black',
+        borderBottomWidth:2,
+        borderLeftWidth:2,
+        borderRightWidth:2,
+        borderColor:'white',
+        fontSize:16
+    },
+    inputbutton:{
+        flex:1,
+        borderLeftWidth:2,
+        color:'white',
+        backgroundColor:'black',
+        borderColor:'white',
+        fontSize:12
     },
     items:{
       width:'100%',
@@ -137,11 +176,13 @@ const MainDisplay = ({route,navigation}:MainProps) => {
        backgroundColor:'white',
        height:'100%',
         width:'100%',
-        flex: 9
+        flex: 8
     },
     lowercontainer:{
+      height:'100%',
+       width:'100%',
        flex: 1,
-       flexDirection:'row'
+       flexDirection:'column'
    },
    inputC:{
     flex:1,
@@ -169,19 +210,11 @@ const MainDisplay = ({route,navigation}:MainProps) => {
       flex:1,
     },
     textbutton:{
-      flex:1,
-      
-    },
-    txtbuttton:{
-      textAlign:'center',
       width:'100%',
       height:'100%',
       backgroundColor:'black',
       fontSize:16,
-      color:'white',
-      borderLeftWidth:2,
-      borderRightWidth:2,
-      borderColor:'white'
+      color:'white'
     }
     
   });

@@ -16,14 +16,26 @@ export type GlobalState = {
     },
     MapShowContract:{
       polygon:LatLng[],
-      hits:LatLng[]|undefined
+      hits:LatLng[]|undefined,
+      contractid:string,
+      city:string
     },
     DetectHits:{
       polygon:LatLng,
-      contractid:string
+      contractid:string,
+      cost:number
+    },
+    AddContracts:{
+      
+    },
+    SubmitContract:{
+      polygon:LatLng[]
     },
     Login:{
   
+    },
+    Explore:{
+      
     }
   };
 

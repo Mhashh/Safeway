@@ -8,6 +8,9 @@ import Login from './userscreens/Login';
 import ShowThisContract from './userscreens/ShowThisContract';
 import { Client } from '@hashgraph/sdk';
 import { AuthContext, RootStackParamList } from './helpers/AuthContext';
+import AddContract from './userscreens/AddContract';
+import SubmitContract from './userscreens/SubmitContract';
+import Explore from './userscreens/Explore';
 
 
 
@@ -16,13 +19,14 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const MyStack = () => {
 
-  const [client,setClient] = React.useState<Client>(undefined);
+  const [userclient,setClient] = React.useState<Client>(undefined);
   const [useracc,setUserAcc] = React.useState<string>("");   
+  const [useradd,setUserAdd] = React.useState<string>("");   
   return (
-    <AuthContext.Provider  value={{client:client,setClient:setClient,useracc,setUserAcc}}>
+    <AuthContext.Provider  value={{userclient:userclient,setClient:setClient,useracc,setUserAcc,userAddress:useradd,setAddr:setUserAdd}}>
     <NavigationContainer>
 
-      {client === undefined?
+      {userclient === undefined?
         <Stack.Navigator>
         <Stack.Screen
           name="Login"
@@ -37,13 +41,28 @@ const MyStack = () => {
           name="Main"
           component={MainDisplay}
           initialParams={{  }}
+          
         />
         <Stack.Screen
           name="MapShowContract"
           component={ShowThisContract}
           initialParams={{  }}
         />
-
+        <Stack.Screen
+          name="AddContracts"
+          component={AddContract}
+          initialParams={{  }}
+        />
+        <Stack.Screen
+          name="SubmitContract"
+          component={SubmitContract}
+          initialParams={{  }}
+        />
+        <Stack.Screen
+          name="Explore"
+          component={Explore}
+          initialParams={{  }}
+        />
         </Stack.Navigator>
       }       
     </NavigationContainer>

@@ -1,7 +1,7 @@
 import React from 'react';
 import MapView, { LatLng, Marker, Polygon } from 'react-native-maps';
 import { StyleSheet, View } from 'react-native';
-import { RootStackParamList } from '../NavigationView';
+import { RootStackParamList } from '../helpers/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import {
@@ -9,7 +9,7 @@ import {
 } from 'expo-sensors';
 
 import { Subscription } from 'expo-sensors/build/Pedometer';
-import { hitDetected } from '../helpers/CallContracts';
+import { detected } from '../helpers/CallUserContracts';
 
 type MapShowContractProps = NativeStackScreenProps<RootStackParamList, 'DetectHits'>
 type AccelerationData = {x:number,y:number,z:number}
@@ -59,7 +59,7 @@ export default function ShowThisContract({route,navigation}:MapShowContractProps
     }    
     ,[])
 
-    //our main algo or ml model to detect abrupt speed changes
+    //to replace with some algo or ml model to detect abrupt speed changes
     //currently using running average ¯\_(ツ)_/¯
     React.useEffect(()=>{
       const curr = calculateMagnitude(accl);

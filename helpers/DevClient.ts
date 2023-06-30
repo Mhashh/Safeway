@@ -8,9 +8,11 @@ const myAccountId = AccountId.fromString(Constants.expoConfig.extra.REACT_APP_MY
 const myPrivateKey = PrivateKey.fromString(Constants.expoConfig.extra.REACT_APP_MY_PRIVATE_KEY);
 
 //our app server link
-const uri = `http://${Constants.manifest.debuggerHost.split(':').shift()}:3333`;
-const apiGetP = "/getP"
-
+export const uri = `http://${Constants.manifest.debuggerHost.split(':').shift()}:3333`;
+export const apiGetP = "/getP"
+export const apiGetC="/getContractsC"
+export const apiGetCC="/getContractsCC"
+export const apiAdd = "/addContract"
 console.log("Acc "+myAccountId);
 console.log("Pri "+myPrivateKey);
 export const client = Client.forTestnet();
@@ -74,7 +76,7 @@ export const createNewAccount =  async() : Promise<NewAccount> =>{
         //Create the transaction
         const transaction = new AccountCreateTransaction()
         .setKey(publicKey)
-        .setInitialBalance(new Hbar(60));
+        .setInitialBalance(new Hbar(120));
 
         //Sign the transaction with the client operator private key and submit to a Hedera network
         
