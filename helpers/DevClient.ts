@@ -65,7 +65,7 @@ export const getBalance =async (address:string):Promise<string> => {
 }
 
 //uses 12 word string as input 
-export const getAccountClientM = (memonic:string,accid:string) : Wallet =>{
+export const getAccountClientM = (memonic:string) : Wallet =>{
 
        const wallet = Wallet.fromMnemonic(memonic);
        return wallet;
@@ -73,7 +73,7 @@ export const getAccountClientM = (memonic:string,accid:string) : Wallet =>{
 }
 
 //uses key string as input 
-export const getAccountClientP = async (privateKey:string,accid:string) : Promise<Wallet> =>{
+export const getAccountClientP = async (privateKey:string) : Promise<Wallet> =>{
     const wallet =new Wallet(privateKey,provider);
     return wallet;
 }
