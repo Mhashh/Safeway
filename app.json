@@ -27,8 +27,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra":{
-      "REACT_APP_MY_ACCOUNT_ID":"0",
-      "REACT_APP_MY_PRIVATE_KEY":"0"
+      "mainContractAddress":"0"
     }
   }
 }
