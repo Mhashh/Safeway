@@ -159,7 +159,7 @@ export default function Login({route,navigation}:LoginProps){
                     }}><Text style={styles.textbutton}>{"Store the words and then press here!"}</Text></Pressable></View>
                 :<View style={styles.buttons}>
                 <Pressable onPress={loginType?oldUser:newUser}><Text style={styles.textbutton}>{loginType ==true?"Enter keys ":"Create keys"}</Text></Pressable>
-                <Pressable onPress={()=>setPageType(!loginType)}><Text style={styles.alternatebutton}>{loginType==true?"Create new keys ?":"Already have an hedera account"}</Text></Pressable>
+                <Pressable onPress={()=>setPageType(!loginType)}><Text style={styles.alternatebutton}>{loginType==true?"Create new keys ?":"Already have etherum 12 word phrase?"}</Text></Pressable>
                 </View>
             }
         </View>
