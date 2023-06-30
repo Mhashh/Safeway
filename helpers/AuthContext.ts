@@ -1,12 +1,10 @@
-import { Client } from "@hashgraph/sdk";
-import React from "react";
+import { Wallet } from "ethers";
+import * as React from "react";
 import { LatLng } from "react-native-maps";
 
 export type GlobalState = {
-    userclient:Client,
-    setClient:React.Dispatch<React.SetStateAction<Client>>,
-    useracc:string,
-    setUserAcc:React.Dispatch<React.SetStateAction<string>>,
+    userclient:Wallet,
+    setClient:React.Dispatch<React.SetStateAction<Wallet>>,
     userAddress:string,
     setAddr:React.Dispatch<React.SetStateAction<string>>
   }
