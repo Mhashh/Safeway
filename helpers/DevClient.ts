@@ -1,11 +1,15 @@
-import {AccountId,PrivateKey,Client, Mnemonic, AccountCreateTransaction, Hbar, AccountBalanceQuery, AccountBalance, PublicKey} from '@hashgraph/sdk'
-  
+// Import the crypto getRandomValues shim (**BEFORE** the shims)
+import "react-native-get-random-values"
+
+// Import the the ethers shims (**BEFORE** ethers)
+import "@ethersproject/shims"
+
+// Import the ethers library
+import { ethers,Wallet } from "ethers";
 import Constants  from 'expo-constants';
 
 console.log("HERE!!")
 // create your client
-const myAccountId = AccountId.fromString(Constants.expoConfig.extra.REACT_APP_MY_ACCOUNT_ID);
-const myPrivateKey = PrivateKey.fromString(Constants.expoConfig.extra.REACT_APP_MY_PRIVATE_KEY);
 
 //our app server link
 export const uri = `http://${Constants.manifest.debuggerHost.split(':').shift()}:3333`;
@@ -13,27 +17,29 @@ export const apiGetP = "/getP"
 export const apiGetC="/getContractsC"
 export const apiGetCC="/getContractsCC"
 export const apiAdd = "/addContract"
-console.log("Acc "+myAccountId);
-console.log("Pri "+myPrivateKey);
-export const client = Client.forTestnet();
-client.setOperator(myAccountId, myPrivateKey);
 
-//Set the default maximum transaction fee (in Hbar)
-client.setDefaultMaxTransactionFee(new Hbar(100));
+// 2. Define network configurations
+const providerRPC = {
+  moonbase: {
+    name: 'moonbase-alpha',
+    rpc: 'https://rpc.api.moonbase.moonbeam.network',
+    chainId: 1287, // 0x507 in hex,
+  },
+};
+// 3. Create ethers provider
+const provider = new ethers.providers.JsonRpcProvider(
+  providerRPC.moonbase.rpc, 
+  {
+    chainId: providerRPC.moonbase.chainId,
+    name: providerRPC.moonbase.name,
+  }
+);
 
-//Set the maximum payment for queries (in Hbar)
-client.setMaxQueryPayment(new Hbar(100));
 
 
-export interface NewAccount {
-    keystring:string,
-    privatekey:string,
-    accid:string,
-    address:string
-}
-
-export interface OldAccount {
-    newclient:Client,
+export type NewAccount={
+    wallet:Wallet,
+    memonic:string,
     address:string
 }
 
@@ -43,116 +49,32 @@ type getpResponse = {
 }
 
 
-export const createNewAccount =  async() : Promise<NewAccount> =>{
-    let stringKey = "";
-    let userKey="";
-    let addr = "";
-    return Mnemonic.generate12().then((value:Mnemonic)=>{
-        stringKey  = value.toString();
-        return Promise.resolve(stringKey)
-
-        
-    }).then((str)=>{
-        const res = fetch(uri+apiGetP, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              normalString: `${str}`,
-            }),
-          })
-          return res;
-    }).then((res)=>{
-        return res.json()
-    }).then((data:getpResponse)=>{
-        console.log("OKAY")
-        let privateKey = PrivateKey.fromString(data.retString)
-        let publicKey = PublicKey.fromString(data.pubString)
-        userKey=data.retString;
-        addr=data.pubString;
-        console.log("createNewAccount "+userKey)
-        //Create the transaction
-        const transaction = new AccountCreateTransaction()
-        .setKey(publicKey)
-        .setInitialBalance(new Hbar(120));
-
-        //Sign the transaction with the client operator private key and submit to a Hedera network
-        
-        return transaction.execute(client);
-
-        
-    }).then((txResponse)=>{
-        //Request the receipt of the transaction
-        return txResponse.getReceipt(client);
-
-       
-    }).then((receipt)=>{
-         //Get the account ID
-         const newAccountId = receipt.accountId;
-         let user = {keystring:stringKey,
-             privatekey:userKey,
-             accid:newAccountId.toString(),
-            address:addr};
-             
-         return user
-    }).catch((error)=>{
-        console.log("createNewAccount "+error);
-        throw new Error("New Key generation failed")
-    })
-    
+export const createNewAccount =  () : NewAccount =>{
+    const wallet = Wallet.createRandom();
+    return{
+        wallet:wallet,
+        memonic:wallet.mnemonic.phrase,
+        address:wallet.publicKey
+    }    
 }
-export const getBalance =async (accid:string):Promise<AccountBalance> => {
-    const query = new AccountBalanceQuery().setAccountId(accid);
-    
-    return query.execute(client).then((balance)=>{
-        return balance;
-    }).catch((err)=>{
-        throw err
-    });
+export const getBalance =async (address:string):Promise<string> => {
+    const balance = await provider.getBalance(address);
+    const formatted = ethers.utils.formatEther(balance)
+    return formatted;
 
 }
 
 //uses 12 word string as input 
-export const getAccountClientM = async (memonic:string,accid:string) : Promise<OldAccount> =>{
+export const getAccountClientM = (memonic:string) : Wallet =>{
 
-       return fetch(uri+apiGetP, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          normalString: `${memonic}`,
-        }),
-        }).then((res)=>{
-            return res.json()
-        }).then((data:getpResponse)=>{
-                
-                let userClient = Client.forTestnet();
-                userClient.setOperator(accid,data.retString);
-                
-                return {newclient:userClient,address:data.pubString};
-            }).catch((error)=>{
-            throw new Error("Client generation failed.");
-        })
-
+       const wallet = Wallet.fromMnemonic(memonic);
+       return wallet;
     
 }
 
 //uses key string as input 
-export const getAccountClientP = async (privateKey:string,accid:string) : Promise<Client> =>{
-    try{  
-        let userClient = Client.forTestnet();
-        userClient.setOperator(accid,privateKey);
-        
-        return userClient;
-    
-    //v2.0.5
-    }
-    catch(error){
-        throw new Error("Client generation failed.");
-    }
+export const getAccountClientP = async (privateKey:string) : Promise<Wallet> =>{
+    const wallet =new Wallet(privateKey,provider);
+    return wallet;
 }
   
