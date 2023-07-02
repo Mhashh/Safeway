@@ -4,8 +4,8 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract Safewaydev{
     address public owner;
-    uint256 public rate=500000000;
-    uint8 public viewratep=10;
+    uint256 public rate=220;
+    uint8 public viewrate=10;
     constructor(){
         owner = msg.sender;
     }
@@ -22,7 +22,7 @@ contract Safewaydev{
 
     function updateVRate(uint8 _rate) public{
         require(owner == msg.sender && _rate>0 && rate<30);
-        viewratep = _rate;
+        viewrate = _rate;
         
     }
     function withdraw() public payable {

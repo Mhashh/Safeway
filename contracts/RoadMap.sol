@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 contract RoadMap{
     
-    address dev = 0x0000000000000000000000000000000000E50d23;
+    address dev = 0xEd4Ba4D1b51A33aDb6ad579a9A6AceFfa889bff2;
     address public owner;
     address alert;
     int32[10] public polygonLong;

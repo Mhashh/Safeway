@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 
 contract RoadAlert{
-    address dev = 0x0000000000000000000000000000000000E50d23;
+    address dev = 0xEd4Ba4D1b51A33aDb6ad579a9A6AceFfa889bff2;
                   
     uint256 amount_per_hit;
     uint public hits = 0;
@@ -64,7 +64,11 @@ contract RoadAlert{
 
     function viewMarkers() external payable{
         require(msg.value == viewcost,"Payment not full.");
-        uint256 comm = ((msg.value/100)*15);
+        (bool success,bytes memory result) = dev.call(abi.encodeWithSignature("viewrate()"));
+        require(success,"no viewrate");
+        
+        (uint8 viewrate) = abi.decode(result,(uint8));
+        uint256 comm = ((msg.value/100)*viewrate);
         payable(dev).transfer(comm);
         
         viewer[msg.sender] = block.timestamp;
