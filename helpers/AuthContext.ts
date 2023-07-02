@@ -13,9 +13,8 @@ export type GlobalState = {
     Main: {
     },
     MapShowContract:{
-      polygon:LatLng[],
-      hits:LatLng[]|undefined,
-      contractid:string,
+      mapid:string,
+      alertid:string,
       city:string
     },
     DetectHits:{
