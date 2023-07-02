@@ -9,7 +9,7 @@ type AddContractProps = NativeStackScreenProps<RootStackParamList, 'AddContracts
 export default function AddContract({route,navigation}:AddContractProps) {
 
   //passed when user clicks or buys to view hits a contract from the list in the main or other screen
-  const {userclient,useracc,userAddress}= React.useContext(AuthContext);
+  const {userclient,userAddress}= React.useContext(AuthContext);
   const [location, setLocation] = React.useState<Location.LocationObject>(null);
   const [cover,setCovers] = React.useState<LatLng[]>([]);
 

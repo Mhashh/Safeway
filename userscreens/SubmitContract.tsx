@@ -7,15 +7,14 @@ import { createNewContract,mainContractCost} from '../helpers/CallContracts';
 
 import { apiAdd, apiGetP, uri } from '../helpers/DevClient';
 import { addToPolygon } from '../helpers/CallUserContracts';
-
-import { Hbar,HbarUnit } from '@hashgraph/sdk';
+import { ethers } from 'ethers';
 
 type SubmitContractProps = NativeStackScreenProps<RootStackParamList,"SubmitContract">
 
 export default function SubmitContract({route,navigation}:SubmitContractProps) {
 
   //passed when user clicks or buys to view hits a contract from the list in the main or other screen
-  const {userclient,useracc}= React.useContext(AuthContext);
+  const {userclient,userAddress}= React.useContext(AuthContext);
   const {polygon} = route.params
   const [a,setInputa] = React.useState<string>()
   const [c,setInputc] = React.useState<string>()
@@ -31,7 +30,7 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
   const addCon = async()=>{
     //cost to dev
     const cost = await mainContractCost(userclient);
-    const res = await createNewContract(new Hbar(a)._valueInTinybar,cost,new Hbar(c)._valueInTinybar,userclient)
+    const res = await createNewContract(ethers.BigNumber.from(a),cost,ethers.BigNumber.from(c),userclient);
 
     console.log(res);
     //success
@@ -46,7 +45,7 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
         body: JSON.stringify({
           mid:res.mapid,
           aid:res.alertid,
-          owner:useracc,
+          owner:userAddress,
           city:d,
           country:e
         }),
@@ -69,8 +68,8 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
     <View style={styles.container}>
            
       <View style={styles.inputs}>
-            <TextInput keyboardType='numeric' style={styles.input} placeholder='View cost' onChangeText={(newtext)=>setInputa(newtext)} value={a}/>
-            <TextInput keyboardType='numeric' style={styles.input} placeholder='Hit cost' onChangeText={(newtext)=>setInputc(newtext)} value={c}/>
+            <TextInput keyboardType='numeric' style={styles.input} placeholder='View cost(wei)' onChangeText={(newtext)=>setInputa(newtext)} value={a}/>
+            <TextInput keyboardType='numeric' style={styles.input} placeholder='Hit cost(wei)' onChangeText={(newtext)=>setInputc(newtext)} value={c}/>
           
             <TextInput style={styles.input} placeholder='City' onChangeText={(newtext)=>setInputd(newtext)} value={d}/>
             <TextInput style={styles.input} placeholder='Country' onChangeText={(newtext)=>setInpute(newtext)} value={e}/>

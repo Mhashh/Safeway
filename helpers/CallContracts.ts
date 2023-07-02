@@ -1,30 +1,73 @@
-import { AccountId, Client, ContractCallQuery, ContractCreateTransaction, ContractFunctionParameters, ContractId, Hbar,  } from '@hashgraph/sdk';
-import {client} from './DevClient';
-import { Alert } from 'react-native';
-import { BigNumber } from '@hashgraph/sdk/lib/Transfer';
-import Constants from 'expo-constants';
+// Import the crypto getRandomValues shim (**BEFORE** the shims)
+import "react-native-get-random-values"
 
-const mainContractId = Constants.expoConfig.extra.mainContractId
-const roadMapFileId= Constants.expoConfig.extra.roadMapFileId
-const roadAlertFileId= Constants.expoConfig.extra.roadAlertFileId
+// Import the the ethers shims (**BEFORE** ethers)
+import "@ethersproject/shims"
 
-const error1 = "transaction failed";
-const error2 = "transaction cancelled";
+// Import the ethers library
+import { BigNumber, ethers,Wallet } from "ethers";
+import{Alert} from 'react-native'
+import Constants  from 'expo-constants';
 
-export type AddResponse = {
+
+// 2. Define network configurations
+const providerRPC = {
+  moonbase: {
+    name: 'moonbase-alpha',
+    rpc: 'https://rpc.api.moonbase.moonbeam.network',
+    chainId: 1287, // 0x507 in hex,
+  },
+};
+// 3. Create ethers provider
+const provider = new ethers.providers.JsonRpcProvider(
+  providerRPC.moonbase.rpc, 
+  {
+    chainId: providerRPC.moonbase.chainId,
+    name: providerRPC.moonbase.name,
+  }
+);
+
+//our app server link
+export const uri = `http://${Constants.manifest.debuggerHost.split(':').shift()}:3333`;
+export const apiGetP = "/getP"
+export const apiGetC="/getContractsC"
+export const apiGetCC="/getContractsCC"
+export const apiAdd = "/addContract"
+
+
+type AddResponse={
     status:boolean,
-    contractid:ContractId|undefined,
-    contractaddress:string|undefined,
+    contractaddress:string,
     msg:string
 }
 
-
-export type CreateResponse = {
+type CreateResponse = {
     status:boolean,
-    mapid:string|undefined,
-    alertid:string|undefined,
+    mapid:string,
+    alertid:string,
     msg:string
 }
+
+const error1="Error"
+const error2="Failed"
+//our compiles for smart contract 
+import mainContractCompile from '../ContractCompiles/Safewaydev.json';
+import mapContractCompile from '../ContractCompiles/RoadMap.json';
+import alertContractCompile from '../ContractCompiles/RoadAlert.json';
+
+const mainContractAdress = Constants.expoConfig.extra.mainContractAddress;
+export const mainContract = new  ethers.Contract(mainContractAdress,mainContractCompile.abi,provider);
+
+const createMapContractFactory = (wallet:Wallet):ethers.ContractFactory=>{
+    const mapContractFactory = new ethers.ContractFactory(mapContractCompile.abi,mapContractCompile.bytecode,wallet);
+    return mapContractFactory;
+}
+
+const createAlertContractFactory = (wallet:Wallet):ethers.ContractFactory=>{
+    const alertContractFactory = new ethers.ContractFactory(alertContractCompile.abi,alertContractCompile.bytecode,wallet);
+    return alertContractFactory;
+}
+
 //dialog box before any query showing cost
 const showAlert = (header:string,detail:string) : Promise<boolean>=>{
     return new Promise((resolve,reject)=>{
@@ -56,49 +99,38 @@ const showAlert = (header:string,detail:string) : Promise<boolean>=>{
     )
 }
 
-export const mainContractCost = async(userclient:Client):Promise<BigNumber> =>{
-    
-     //Create the contract query
-     const query = new ContractCallQuery()
-     .setContractId(mainContractId)
-     .setGas(100_000)
-     .setFunction("rate");
-    
-     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
-     const response = await query.execute(userclient);
-     
-     
-     //Get the transaction consensus status
-     const cost = response.getUint256(0);
-     const amt = Hbar.fromTinybars(cost);
-     return amt.toBigNumber();
+//main contract cost
+export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
+    const res = await mainContract.rate();
+    return res;
 }
 
-//add new map region
-  export const addNewMap = async(viewcost:BigNumber,price:BigNumber,userClient:Client):Promise<AddResponse>=>{
-    //Create the query
-    const query = new ContractCreateTransaction()
-    .setBytecodeFileId(roadMapFileId)
-    .setGas(10_000_000)
-    .setConstructorParameters(new ContractFunctionParameters()
-        .addUint256(viewcost))
-    .setInitialBalance(price);
 
-    const accept =  await showAlert("Adding new map region","Estimated cost : "+price.toString()+" hbar plus 11 hbar");
+//add new map region
+  export const addNewMap = async(price:BigNumber,wallet:Wallet):Promise<AddResponse>=>{
+    
+    const factory = createMapContractFactory(wallet);
+    const overrides ={
+        value:ethers.utils.formatEther(price)
+    }
+    const transaction = factory.getDeployTransaction(overrides)
+    const gasgasgas = await provider.estimateGas(transaction);
+    const accept =  await showAlert("Adding new map region","Estimated cost : "+(overrides.value)+" eth , twice or more"+gasgasgas+" gas ");
     
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
     try{
         if(accept){
-            const response = (await query.execute(userClient));
-            console.log("RESPONSE addNewMap tid : "+response.transactionId.toString())
-            const reciept = await response.getReceipt(userClient);
             
+            const contract = await factory.deploy(overrides);
+            const txReceipt:ethers.ContractReceipt= await contract.deploymentTransaction().wait();
             
-            return{
-                status:true,
-                contractid:reciept.contractId,
-                contractaddress:reciept.contractId.toSolidityAddress(),
-                msg:"RoadMap Contract created"
+            if(txReceipt.status == 1){
+                console.log(txReceipt.contractAddress)
+                return{
+                    status:true,
+                    contractaddress:txReceipt.contractAddress,
+                    msg:"RoadMap Contract created"
+                }
             }
         }
     }
@@ -106,14 +138,12 @@ export const mainContractCost = async(userclient:Client):Promise<BigNumber> =>{
         console.log(err)
         return{
             status:false,
-            contractid:undefined,
             contractaddress:undefined,
             msg:"RoadMap Contract payment declined"
         }
     }
     return{
         status:false,
-        contractid:undefined,
         contractaddress:undefined,
         msg:"RoadMap Contract creation failed"
     }
@@ -121,81 +151,74 @@ export const mainContractCost = async(userclient:Client):Promise<BigNumber> =>{
 }
 
 //add new hit region
-export const addNewAlert = async(amount_per_hit:BigNumber,userClient:Client,):Promise<AddResponse>=>{
-    //Create the query
-    const query = new ContractCreateTransaction()
-    .setBytecodeFileId(roadAlertFileId)
-    .setGas(10_000_000)
-    .setConstructorParameters(new ContractFunctionParameters()
-        .addUint256(amount_per_hit));
-
-   
+export const addNewAlert = async(amount_per_hit:BigNumber,viewcost:BigNumber,wallet:Wallet,):Promise<AddResponse>=>{
+    const factory = createAlertContractFactory(wallet);
+    const transaction = factory.getDeployTransaction(amount_per_hit,viewcost)
     
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
     try{
-            const response = (await query.execute(userClient));
-            console.log("RESPONSE addNewAlert  tid : "+response.transactionId.toString())
-            const reciept = await response.getReceipt(userClient);
-
+            
+        const contract = await factory.deploy(amount_per_hit,viewcost);
+        const txReceipt:ethers.ContractReceipt= await contract.deploymentTransaction().wait();
+        
+        if(txReceipt.status == 1){
+            console.log(txReceipt.contractAddress)
             return{
                 status:true,
-                contractid:reciept.contractId,
-                contractaddress:reciept.contractId.toSolidityAddress(),
+                contractaddress:txReceipt.contractAddress,
                 msg:"RoadAlert Contract created"
             }
+        }
+        
     }
     catch(err){
         console.log(err)
         return{
             status:false,
-            contractid:undefined,
             contractaddress:undefined,
-            msg:"RoadAlert Contract creation failed"
+            msg:"RoadAlert  Contract payment declined"
         }
     }
     return{
         status:false,
-        contractid:undefined,
         contractaddress:undefined,
-        msg:"RoadAlert Contract creation failed"
+        msg:"RoadAlert  Contract creation failed"
     }
 //v2.0.0
 }
 
 //add new hit region
-export const connectMapandAlert = async(mapcontractid:ContractId|string,address:string,userClient:Client,):Promise<string>=>{
-    //Create the query
-    const query = new ContractCallQuery()
-    .setContractId(mapcontractid)
-    .setGas(10_000_000)
-    .setFunction("addAlert",new ContractFunctionParameters()
-        .addAddress("0x"+address));
+export const connectMapandAlert = async(mapcontractaddress:string,alertaddress:string,wallet:Wallet):Promise<string>=>{
+    
+    const contract = new ethers.Contract(mapcontractaddress,mapContractCompile.abi,wallet);
 
-   
+    
     
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
     try{
-            const response = (await query.execute(userClient));
-            console.log("RESPONSE connectMapandAlert  gas used : "+response.gasUsed.toString())
+        const txReceipt = await contract.addAlert(alertaddress);
+        await txReceipt.wait();
+        if(txReceipt.status ==1){
             return "Success"
+        }
     }
     catch(err){
         console.log(err)
-        return error1
+        return error1;
     }
-    return error2
+    return error2;
 //v2.0.0
 }
 
 //create new contract
 //add new hit region
-export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount_per_hit:BigNumber,userClient:Client):Promise<CreateResponse>=>{
+export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount_per_hit:BigNumber,wallet:Wallet):Promise<CreateResponse>=>{
     
    
     
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
     try{
-        const response = await  addNewMap(viewcost,price,userClient)
+        const response = await  addNewMap(price,wallet)
         if(!response.status){
             return{
                 status:false,
@@ -205,7 +228,7 @@ export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount
             }
         }
         else{
-            const secondresponse = await addNewAlert(amount_per_hit,userClient);
+            const secondresponse = await addNewAlert(amount_per_hit,viewcost,wallet);
             if(!secondresponse.status){
                 return{
                     status:false,
@@ -215,7 +238,7 @@ export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount
                 }
             }
             else{
-                const thirdresponse = await connectMapandAlert(response.contractid,secondresponse.contractaddress,userClient);
+                const thirdresponse = await connectMapandAlert(response.contractaddress,secondresponse.contractaddress,wallet);
                 if(thirdresponse == error1 || thirdresponse == error2){
                     return{
                         status:false,
@@ -225,8 +248,8 @@ export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount
                     }
                 }
                 else{
-                    const mapID = response.contractid.toStringWithChecksum(userClient).split("-")[0];
-                    const alertID = secondresponse.contractid.toStringWithChecksum(userClient).split("-")[0];
+                    const mapID = response.contractaddress;
+                    const alertID = secondresponse.contractaddress;
                     console.log("IDS : "+mapID+"  : "+alertID)
                     return{
                         status:false,
