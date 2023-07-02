@@ -1,15 +1,19 @@
 import React from 'react';
 import MapView, { LatLng, Marker, Polygon, Region } from 'react-native-maps';
 import { StyleSheet, View,Text } from 'react-native';
-import { RootStackParamList } from '../helpers/AuthContext';
+import { AuthContext, RootStackParamList } from '../helpers/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { hits, polygon } from '../helpers/CallUserContracts';
 
 type MapShowContractProps = NativeStackScreenProps<RootStackParamList, 'MapShowContract'>
 
 export default function ShowThisContract({route,navigation}:MapShowContractProps) {
 
+  const {userclient} = React.useContext(AuthContext);
+
+
   //passed when user clicks or buys to view hits a contract from the list in the main or other screen
-  const {polygon,hits,contractid,city} = route.params;
+  const {mapid,alertid,city} = route.params;
 
   //road obstructions or caution region
   const [markers,setMarkers] = React.useState<LatLng[]>([]);
@@ -21,26 +25,24 @@ export default function ShowThisContract({route,navigation}:MapShowContractProps
   //region of map where obstructions are mapped
   const [area,setArea] = React.useState<LatLng[]>([]);
   
+  const getPolygon = async()=>{
+    const totalpoints =  await hits(mapid,userclient);
+    if(totalpoints >0){
+      let mappolygon:LatLng[]=[];
+      for(let i = 0;i<totalpoints;i++){
+        const coord = await polygon(mapid,i,userclient);
+        if(coord!=undefined)
+        {
+          mappolygon.push(coord);
+        }
+      }
+      setMarkers(mappolygon);
+    }
+  }
   
   React.useEffect(
     ()=>{
-      if(hits !== undefined){        
-        setMarkers(hits);
-      }
-      if(polygon!== undefined){
-        setArea(polygon);
-        let longavg = 0;
-        let latavg = 0;
-        area.forEach((value:LatLng,index:number)=>{
-          longavg = (longavg+(value.longitude/1000000))/2
-          latavg = (latavg+(value.latitude/1000000))/2
-        })
-        setRegion({
-          ...region,
-          latitude:latavg,
-          longitude:longavg
-        })
-      }
+      getPolygon();
     }    
     ,[])
 
@@ -50,12 +52,13 @@ export default function ShowThisContract({route,navigation}:MapShowContractProps
     <View style={styles.container}>
       <View style={styles.infobar}>
         <Text style={styles.info}>
-          MapId : {contractid}{'\n'}City: {city}
+          MapId : {mapid}{'\n'}City: {city}
         </Text>
       </View>
-      <MapView style={styles.map} region={region}>
-        <Polygon coordinates={area}></Polygon>
-
+      <MapView style={styles.map} region={region}> showsUserLocation={true}
+        {
+          area.length>2 &&<Polygon coordinates={area}></Polygon>
+        }
         {markers.map((marker, index) => (
           <Marker
             key={index}
@@ -72,7 +75,7 @@ const styles = StyleSheet.create({
     flexDirection:'column'
   },
   map: {
-    flex:5,
+    flex:8,
     width: '100%',
     height: '100%'
   },

@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthContext, RootStackParamList } from '../helpers/AuthContext';
 
 import { apiGetC, getBalance, uri } from '../helpers/DevClient';
@@ -25,12 +25,20 @@ type UserContractList = {
   country:string,
   alertid:string,
   mapid:string,
+  nav:NativeStackNavigationProp<RootStackParamList, "Main", undefined>,
 }
 
-const UserContractItem = ({_id,ownerid,city,country,alertid,mapid}: UserContractList) => (
-  <View style={styles.usercontract}>
+const UserContractItem = ({_id,ownerid,city,country,alertid,mapid,nav}: UserContractList) => (
+  <Pressable style={styles.usercontract} onPress={(ev)=>{
+      nav.navigate("MapShowContract",{
+        mapid:mapid,
+        alertid:alertid,
+        city:city,
+      });
+    }
+  }>
     <Text style={styles.items}>{mapid} {alertid} {city} { country}</Text>
-  </View>
+  </Pressable>
 );
 const MainDisplay = ({route,navigation}:MainProps) => {
   
@@ -80,7 +88,14 @@ const MainDisplay = ({route,navigation}:MainProps) => {
       <View style={styles.middlecontainer}>
       <FlatList
             data={userContracts}
-            renderItem={({item}) => <UserContractItem _id={item._id} ownerid={item.ownerid} city={item.city} country={item.country} mapid={item.mapid} alertid={item.alertid}  />}
+            renderItem={({item}) => <UserContractItem 
+                  _id={item._id} 
+                  ownerid={item.ownerid} 
+                  city={item.city} 
+                  country={item.country} 
+                  mapid={item.mapid} 
+                  alertid={item.alertid}  
+                  nav={navigation}/>}
           
             keyExtractor={item => item._id}
           ></FlatList>
