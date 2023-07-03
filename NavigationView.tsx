@@ -6,11 +6,11 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import MainDisplay from './userscreens/Main';
 import Login from './userscreens/Login';
 import ShowThisContract from './userscreens/ShowThisContract';
-import { Client } from '@hashgraph/sdk';
 import { AuthContext, RootStackParamList } from './helpers/AuthContext';
 import AddContract from './userscreens/AddContract';
 import SubmitContract from './userscreens/SubmitContract';
 import Explore from './userscreens/Explore';
+import { Wallet } from 'ethers';
 
 
 
@@ -19,13 +19,11 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const MyStack = () => {
 
-  const [userclient,setClient] = React.useState<Client>(undefined);
-  const [useracc,setUserAcc] = React.useState<string>("");   
+  const [userclient,setClient] = React.useState<Wallet>(undefined);
   const [useradd,setUserAdd] = React.useState<string>("");   
   return (
-    <AuthContext.Provider  value={{userclient:userclient,setClient:setClient,useracc,setUserAcc,userAddress:useradd,setAddr:setUserAdd}}>
+    <AuthContext.Provider  value={{userclient:userclient,setClient:setClient,userAddress:useradd,setAddr:setUserAdd}}>
     <NavigationContainer>
-
       {userclient === undefined?
         <Stack.Navigator>
         <Stack.Screen
@@ -33,7 +31,6 @@ const MyStack = () => {
           component={Login}
           initialParams={{  }}
         />
-
         </Stack.Navigator>
       :
         <Stack.Navigator>
@@ -66,8 +63,7 @@ const MyStack = () => {
         </Stack.Navigator>
       }       
     </NavigationContainer>
-    </AuthContext.Provider>
-    
+    </AuthContext.Provider>    
   );
 };
 

@@ -61,10 +61,7 @@ function App(): JSX.Element {
 
 
   return (
-    
-        
         <MyStack ></MyStack>
-        
   );
 }
 
