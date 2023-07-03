@@ -30,10 +30,10 @@ contract RoadAlert{
     //contributors
     function detected(int32 long,int32 lat) external {
         require(msg.sender == owner ||  (amount_per_hit > 0 &&  balance >= amount_per_hit ),"Cant pay");
-        require((hits<100)&&(long>180000000 && long<-90000000 && lat>180000000 && lat<-90000000));
+        require((hits<100)&&(long<=180000000 && long>=-90000000 && lat<=180000000 && lat>=-90000000));
         //checking nearby detected points ~ > 10m distance
         for(uint i = 0;i<hits;i++){
-            require((longitude[i]+latitude[i]-long-lat) <= 198,"invalid");
+            require((longitude[i]+latitude[i]-long-lat) >= 198,"too close");
                         
         }
         if(msg.sender != owner){
@@ -76,7 +76,7 @@ contract RoadAlert{
 
     function viewMarker(uint index) external  view returns(int32 ,int32 ){
         uint time = (viewer[msg.sender]  - block.timestamp)/86400;
-        require(time>=1,"ended");
+        require(time<=1,"ended");
         return(longitude[index],latitude[index]);
     }
 

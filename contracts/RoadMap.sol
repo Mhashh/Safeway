@@ -37,10 +37,10 @@ contract RoadMap{
     //owner, region of map cover
     function addToPolygon(int32 long,int32 lat) external  {
         require(msg.sender == owner,"Not Owner");
-        require((hits<100)&&(long>180000000 && long<-90000000 && lat>180000000 && lat<-90000000),"");
+        require((hits<100)&& (long<=180000000 && long>=-90000000 && lat<=180000000 && lat>=-90000000),"range");
 
         polygonLong[hits] = long;
-        polygonLong[hits] = lat;
+        polygonLat[hits] = lat;
         hits++;
     }
 
