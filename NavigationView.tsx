@@ -11,6 +11,7 @@ import AddContract from './userscreens/AddContract';
 import SubmitContract from './userscreens/SubmitContract';
 import Explore from './userscreens/Explore';
 import { Wallet } from 'ethers';
+import DetectHits from './userscreens/DetectHits';
 
 
 
@@ -58,6 +59,11 @@ const MyStack = () => {
         <Stack.Screen
           name="Explore"
           component={Explore}
+          initialParams={{  }}
+        />
+        <Stack.Screen
+          name="DetectHits"
+          component={DetectHits}
           initialParams={{  }}
         />
         </Stack.Navigator>
