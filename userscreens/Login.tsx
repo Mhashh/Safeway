@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { RootStackParamList } from "../helpers/AuthContext"
-import { Text,TextInput, View,StyleSheet, Pressable, NativeSyntheticEvent, TextInputEndEditingEventData, TextInputChangeEventData} from "react-native"
+import { Text,TextInput, View,StyleSheet, Pressable, NativeSyntheticEvent, TextInputEndEditingEventData, TextInputChangeEventData, ActivityIndicator} from "react-native"
 import * as  React from "react"
 import { NewAccount, createNewAccount, getAccountClientM, getAccountClientP } from "../helpers/DevClient"
 import { AuthContext } from "../helpers/AuthContext"
@@ -13,26 +13,28 @@ type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>
 export default function Login({route,navigation}:LoginProps){
 
     const [loginType,setPageType]= React.useState<boolean>(true);
+    const [loading,setLoading] = React.useState<boolean>(false);
     
     const [created,setCreateFlag ] = React.useState<boolean>(false);
     const {setClient,setAddr} = React.useContext(AuthContext)
     const [tempWallet,setWallet] = React.useState<Wallet>();
     //12 word key string states
 
-    const[a,setA] = React.useState<string>("dash")
-    const[b,setB] = React.useState<string>("bar")
-    const[c,setC] = React.useState<string>("dinner")
-    const[d,setD] = React.useState<string>("time")
-    const[e,setE] = React.useState<string>("spirit")
-    const[f,setF] = React.useState<string>("gesture")
-    const[g,setG] = React.useState<string>("globe")
-    const[h,setH] = React.useState<string>("wash")
-    const[i,setI] = React.useState<string>("since")
-    const[j,setJ] = React.useState<string>("awkward")
-    const[k,setK] = React.useState<string>("sweet")
-    const[l,setL] = React.useState<string>("fade")
+    const[a,setA] = React.useState<string>("interest")
+    const[b,setB] = React.useState<string>("invite")
+    const[c,setC] = React.useState<string>("solution")
+    const[d,setD] = React.useState<string>("own")
+    const[e,setE] = React.useState<string>("box")
+    const[f,setF] = React.useState<string>("fetch")
+    const[g,setG] = React.useState<string>("crouch")
+    const[h,setH] = React.useState<string>("fossil")
+    const[i,setI] = React.useState<string>("region")
+    const[j,setJ] = React.useState<string>("smile")
+    const[k,setK] = React.useState<string>("calm")
+    const[l,setL] = React.useState<string>("rhythm")
 
     const newUser = ()=>{
+        setLoading(true);
         const account = createNewAccount();
 
 
@@ -53,21 +55,24 @@ export default function Login({route,navigation}:LoginProps){
         setAddr(account.address)
         setWallet(account.wallet)//temporary , to wait so user can notedown memonic, there a button willset client
         setCreateFlag(true);
+        setLoading(false);
         console.log(account.address);
         
     }
     const oldUser = () =>{
         let wordString = a+" "+b+" "+c+" "+d+" "+e+" "+f+" "+g+" "+h+" "+i+" "+j+" "+k+" "+l
-        
+        setLoading(true);
         const wallet = getAccountClientM(wordString);
         setAddr(wallet.address);
+        setLoading(false);
         setClient(wallet);
     }
 
 
     return(
         <View style={styles.outerbox}>
-            {(created||loginType)&&<View style={styles.upperbox}><View style={styles.textbox}>
+            {loading&&<ActivityIndicator/>}
+            {(!loading)&&(created||loginType)&&<View style={styles.upperbox}><View style={styles.textbox}>
                         <TextInput style={styles.inputbox}
                             placeholder="12 word key"
                             value={a}
@@ -133,7 +138,7 @@ export default function Login({route,navigation}:LoginProps){
                         />
                     </View>
                 </View>
-            }{created?<View style={styles.buttons}>
+            }{(!loading)&&created?<View style={styles.buttons}>
                     <Pressable onPress={()=>{
                         
                         

@@ -47,6 +47,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
     const [userContracts,setUC] = React.useState<UserContractList[]>();
 
     const getUserContractList =async () => {
+      console.log(userAddress)
       const webres = await fetch(uri+apiGetC, {
         method: 'POST',
         headers: {
@@ -65,7 +66,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
     React.useEffect(()=>{
       if(userAddress!=="" ){
         getBalance(userAddress).then((bal)=>{
-          setBalance(balance)
+          setBalance(bal)
         });
         getUserContractList()
         
@@ -78,9 +79,11 @@ const MainDisplay = ({route,navigation}:MainProps) => {
             Balance : {balance}{'\n'}<Text style={styles.inputA}>Address: {userAddress}</Text> 
           </Text>
           <Pressable onPress={(ev)=>{
-            getUserContractList();
-            getBalance(userAddress).then((bal)=>{
+            getUserContractList().then().catch((err)=>{console.log(err)})
+            getBalance(userAddress).then( (bal)=>{
               setBalance(balance)
+            }).catch((err)=>{
+              console.log(err)
             });
           }}><Text style={styles.inputC}>Refresh</Text></Pressable>
       </View>
@@ -176,7 +179,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
       color:'white',
       fontSize:20
     },inputA:{
-      fontSize:15
+      fontSize:12
     },
     button:{
       backgroundColor:'grey',

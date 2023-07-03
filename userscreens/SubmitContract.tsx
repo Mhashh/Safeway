@@ -7,7 +7,7 @@ import { createNewContract,mainContractCost} from '../helpers/CallContracts';
 
 import { apiAdd, apiGetP, uri } from '../helpers/DevClient';
 import { addToPolygon } from '../helpers/CallUserContracts';
-import { ethers } from 'ethers';
+import { ethers,BigNumber } from 'ethers';
 
 type SubmitContractProps = NativeStackScreenProps<RootStackParamList,"SubmitContract">
 
@@ -16,26 +16,31 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
   //passed when user clicks or buys to view hits a contract from the list in the main or other screen
   const {userclient,userAddress}= React.useContext(AuthContext);
   const {polygon} = route.params
-  const [a,setInputa] = React.useState<string>()
-  const [c,setInputc] = React.useState<string>()
+  const [a,setInputa] = React.useState<string>("")
+  const [c,setInputc] = React.useState<string>("")
   const [d,setInputd] = React.useState<string>("")
   const [e,setInpute] = React.useState<string>("")
 
   const addPol = async(contractid)=>{
     polygon.forEach(async (value,i)=>{
-      await addToPolygon(contractid,value.longitude*1000000,value.latitude*1000000,userclient);
+      const success = await addToPolygon(contractid,value.longitude*1000000,value.latitude*1000000,userclient);;
+
+      if(success){
+        console.log(true)
+      }
     })
   }
 
   const addCon = async()=>{
     //cost to dev
     const cost = await mainContractCost(userclient);
-    const res = await createNewContract(ethers.BigNumber.from(a),cost,ethers.BigNumber.from(c),userclient);
+    console.log(a+" "+c+" "+cost);
+    const res = await createNewContract(BigNumber.from(a),cost,BigNumber.from(c),userclient);
 
     console.log(res);
     //success
     if(res.status){
-      await addPol(res);
+      await addPol(res.mapid);
       const webres =await fetch(uri+apiAdd, {
         method: 'POST',
         headers: {

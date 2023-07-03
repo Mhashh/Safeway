@@ -1,5 +1,5 @@
 import React from 'react';
-import MapView, { LatLng, Marker, Polygon, Region } from 'react-native-maps';
+import MapView, { Camera, LatLng, Marker, Polygon, Region } from 'react-native-maps';
 import { StyleSheet, View,Text } from 'react-native';
 import { AuthContext, RootStackParamList } from '../helpers/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -20,23 +20,34 @@ export default function ShowThisContract({route,navigation}:MapShowContractProps
 
   
   //region of map where obstructions are mapped
-  const [region,setRegion] = React.useState<Region>({latitude:0,longitude:0,latitudeDelta:0,longitudeDelta:0});
+  const [region,setRegion] = React.useState<Camera>({center:{latitude:0,longitude:0},heading:0,zoom:14,pitch:0,altitude:undefined});
   
   //region of map where obstructions are mapped
   const [area,setArea] = React.useState<LatLng[]>([]);
   
   const getPolygon = async()=>{
     const totalpoints =  await hits(mapid,userclient);
+    
+    console.log("hits:" + totalpoints)
     if(totalpoints >0){
       let mappolygon:LatLng[]=[];
       for(let i = 0;i<totalpoints;i++){
         const coord = await polygon(mapid,i,userclient);
+        console.log(coord)
         if(coord!=undefined)
         {
+          
           mappolygon.push(coord);
         }
       }
-      setMarkers(mappolygon);
+      setRegion({
+        ...region,
+        center:{
+          latitude:mappolygon[0].latitude,
+          longitude:mappolygon[0].longitude
+        }
+      })
+      setArea(mappolygon);
     }
   }
   
@@ -46,20 +57,17 @@ export default function ShowThisContract({route,navigation}:MapShowContractProps
     }    
     ,[])
 
-  
+  const onRegionChanges=(reg:Camera)=>{
+    setRegion(reg)
+  }
   
   return (
     <View style={styles.container}>
-      <View style={styles.infobar}>
-        <Text style={styles.info}>
-          MapId : {mapid}{'\n'}City: {city}
-        </Text>
-      </View>
-      <MapView style={styles.map} region={region}> showsUserLocation={true}
+      <View style={styles.infobar}><Text style={styles.info}>MapId : {mapid}{'\n'}City: {city}</Text></View>
+      <MapView style={styles.map} camera={region} showsUserLocation={true}>
         {
           area.length>2 &&<Polygon coordinates={area}></Polygon>
-        }
-        {markers.map((marker, index) => (
+        }{area.map((marker, index) => (
           <Marker
             key={index}
             coordinate={marker}
@@ -72,7 +80,9 @@ export default function ShowThisContract({route,navigation}:MapShowContractProps
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection:'column'
+    flexDirection:'column',
+    width:'100%',
+    height:'100%'
   },
   map: {
     flex:8,
