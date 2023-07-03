@@ -111,7 +111,7 @@ export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
     
     const factory = createMapContractFactory(wallet);
     const overrides ={
-        value:ethers.utils.formatEther(price)
+        value:price.toString()
     }
     const transaction = factory.getDeployTransaction(overrides)
     const gasgasgas = await provider.estimateGas(transaction);
@@ -120,9 +120,8 @@ export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
     try{
         if(accept){
-            
             const contract = await factory.deploy(overrides);
-            const txReceipt:ethers.ContractReceipt= await contract.deploymentTransaction().wait();
+            const txReceipt:ethers.ContractReceipt= await contract.deployTransaction.wait();
             
             if(txReceipt.status == 1){
                 console.log(txReceipt.contractAddress)
@@ -135,7 +134,7 @@ export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
         }
     }
     catch(err){
-        console.log(err)
+        console.log("addNewMap : "+err)
         return{
             status:false,
             contractaddress:undefined,
@@ -153,13 +152,13 @@ export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
 //add new hit region
 export const addNewAlert = async(amount_per_hit:BigNumber,viewcost:BigNumber,wallet:Wallet,):Promise<AddResponse>=>{
     const factory = createAlertContractFactory(wallet);
-    const transaction = factory.getDeployTransaction(amount_per_hit,viewcost)
+    
     
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
     try{
             
         const contract = await factory.deploy(amount_per_hit,viewcost);
-        const txReceipt:ethers.ContractReceipt= await contract.deploymentTransaction().wait();
+        const txReceipt:ethers.ContractReceipt= await contract.deployTransaction.wait();
         
         if(txReceipt.status == 1){
             console.log(txReceipt.contractAddress)
@@ -196,8 +195,8 @@ export const connectMapandAlert = async(mapcontractaddress:string,alertaddress:s
     
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
     try{
-        const txReceipt = await contract.addAlert(alertaddress);
-        await txReceipt.wait();
+        let tx = await contract.addAlert(alertaddress);
+        let txReceipt = await tx.wait();
         if(txReceipt.status ==1){
             return "Success"
         }
@@ -214,7 +213,7 @@ export const connectMapandAlert = async(mapcontractaddress:string,alertaddress:s
 //add new hit region
 export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount_per_hit:BigNumber,wallet:Wallet):Promise<CreateResponse>=>{
     
-   
+   console.log("createNewContract")
     
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
     try{

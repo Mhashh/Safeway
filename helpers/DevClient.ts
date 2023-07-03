@@ -14,7 +14,7 @@ console.log("HERE!!")
 //our app server link
 export const uri = `http://${Constants.manifest.debuggerHost.split(':').shift()}:3333`;
 export const apiGetP = "/getP"
-export const apiGetC="/getContractsC"
+export const apiGetC="/getContracts"
 export const apiGetCC="/getContractsCC"
 export const apiAdd = "/addContract"
 
@@ -58,16 +58,26 @@ export const createNewAccount =  () : NewAccount =>{
     }    
 }
 export const getBalance =async (address:string):Promise<string> => {
-    const balance = await provider.getBalance(address);
-    const formatted = ethers.utils.formatEther(balance)
-    return formatted;
+  console.log("getBalance( "+address+" )")
+    try{
+      const balance = await provider.getBalance(address);
+      console.log("getBalance( "+address+" ) : "+balance)
+      const formatted = ethers.utils.formatEther(balance)
+      return formatted;
+    }
+    catch(err){
+      console.log(err)
+    }
+    return "unable to load";  
 
 }
 
 //uses 12 word string as input 
 export const getAccountClientM = (memonic:string) : Wallet =>{
 
-       const wallet = Wallet.fromMnemonic(memonic);
+       let wallet = Wallet.fromMnemonic(memonic);
+       wallet = wallet.connect(provider);
+    
        return wallet;
     
 }

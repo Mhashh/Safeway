@@ -143,8 +143,8 @@ export const polygon = async(contractAddress:string,index:number,wallet:Wallet):
          const res= await contract.polygon(index);
          if(res.longitude !== undefined){
             return{
-                longitude:res[0],
-                latitude:res[1]
+                longitude:res[0]/1000000,
+                latitude:res[1]/1000000
             }
          }
      }
