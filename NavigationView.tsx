@@ -12,6 +12,7 @@ import SubmitContract from './userscreens/SubmitContract';
 import Explore from './userscreens/Explore';
 import { Wallet } from 'ethers';
 import DetectHits from './userscreens/DetectHits';
+import AddFund from './userscreens/AddFund';
 
 
 
@@ -64,6 +65,11 @@ const MyStack = () => {
         <Stack.Screen
           name="DetectHits"
           component={DetectHits}
+          initialParams={{  }}
+        />
+        <Stack.Screen
+          name="AddFund"
+          component={AddFund}
           initialParams={{  }}
         />
         </Stack.Navigator>
