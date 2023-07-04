@@ -13,14 +13,16 @@ export type GlobalState = {
     Main: {
     },
     MapShowContract:{
+      name:string,
       mapid:string,
       alertid:string,
-      city:string
+      ownerid:string,
+      city:string,
     },
     DetectHits:{
-      polygon:LatLng,
+      polygon:LatLng[],
       contractid:string,
-      cost:number
+      ownerid:string
     },
     AddContracts:{
       
@@ -33,6 +35,9 @@ export type GlobalState = {
     },
     Explore:{
       
+    },
+    AddFund:{
+      contractid:string
     }
   };
 
