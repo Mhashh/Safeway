@@ -1,51 +1,65 @@
 
 import * as React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+  Alert,
   FlatList,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthContext, RootStackParamList } from '../helpers/AuthContext';
 
-import { apiGetC, getBalance, uri } from '../helpers/DevClient';
+import { apiGetCC, getBalance, uri } from '../helpers/DevClient';
 
 
 type ExploreProps = NativeStackScreenProps<RootStackParamList, 'Explore'>
 type UserContractList = {
   _id:string,
+  name:string,
   ownerid:string,
   city:string,
   country:string,
   alertid:string,
   mapid:string,
+  nav:NativeStackNavigationProp<RootStackParamList, "Explore", undefined>
 }
 
-const UserContractItem = ({_id,ownerid,city,country,alertid,mapid}: UserContractList) => (
-  <View style={styles.usercontract}>
-    <Text style={styles.items}>{mapid} {alertid} {city} { country}</Text>
-  </View>
+const UserContractItem = ({_id,name,ownerid,city,country,alertid,mapid,nav}: UserContractList) => (
+  <Pressable style={styles.usercontract} onPress={(ev)=>{
+      nav.navigate("MapShowContract",{
+        name:name,
+        mapid:mapid,
+        alertid:alertid,
+        city:city,
+        ownerid:ownerid
+      });
+    }
+  }>
+    <Text style={styles.items}>{name}{'\n'}<Text style={styles.inputC}>{mapid}{'\n'}{city},{ country}</Text></Text>
+  </Pressable>
 );
 const Explore = ({route,navigation}:ExploreProps) => {
   
-    const {userclient,useracc,userAddress}= React.useContext(AuthContext);
-    const [city,setCity] = React.useState<string>()
-    const [country,setCountry] = React.useState<string>()
+    const {userclient,userAddress}= React.useContext(AuthContext);
     const [balance,setBalance] = React.useState<string>("0");
     const [userContracts,setUC] = React.useState<UserContractList[]>();
-
+    const [city,setCity] = React.useState<string>("");
+    const [country,setCountry] = React.useState<string>("");
     const getUserContractList =async () => {
-      const webres = await fetch(uri+apiGetC, {
+      console.log(userAddress)
+      const webres = await fetch(uri+apiGetCC, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          city:useracc,
+          city:city,
           country:country
         }),
       })
@@ -55,58 +69,51 @@ const Explore = ({route,navigation}:ExploreProps) => {
       console.log(userContracts)
     }
     React.useEffect(()=>{
-      if(useracc!=="" ){
-        getBalance(useracc).then((bal)=>{
-          setBalance(bal.hbars.toBigNumber().toString()+" hbars")
+      if(userAddress!=="" ){
+        getBalance(userAddress).then((bal)=>{
+          setBalance(bal)
         });
-        getUserContractList()
         
       }
     },[]);
 
     return (
-      <View style={styles.screen}><View style={styles.topbar}>
-          <Text style={styles.inputB}>
-            Balance : {balance}{'\n'}<Text style={styles.inputA}>Address: {useracc}</Text> 
-          </Text>
-          <Pressable onPress={(ev)=>{
-            getUserContractList();
-            getBalance(useracc).then((bal)=>{
-              setBalance(bal.hbars.toBigNumber().toString()+" hbars")
-            });
-          }}><Text style={styles.inputC}>Refresh</Text></Pressable>
-      </View><View style={styles.lowercontainer}><View style={styles.inputB}>
-             <TextInput style={styles.inputbox}
-                placeholder="city name"
-                value={city}
-                onChangeText={setCity}
-            />
-          <TextInput style={styles.inputbox}
-                placeholder="country name"
-                value={country}
-                onChangeText={setCountry}
-            />
-            </View>
-          <Pressable 
-            style={styles.inputC}
-            onPress={()=>{
-                getUserContractList();
-                }
-            }  ><Text >
-                search
-            </Text>
-          </Pressable>
-        </View>
+      <View style={styles.screen} ><View style={styles.topbar}>
+          <Text style={styles.inputA}>{userAddress}</Text>
+      </View><View style={styles.inputcontainer}>
+        <TextInput style={styles.inputB} 
+          placeholder="city"
+          value={city}
+          onChangeText={setCity}/>
+        <TextInput style={styles.inputB} 
+          placeholder="country"
+          value={country}
+          onChangeText={setCountry}/>
+        <Pressable style={styles.textbutton}
+          onPress={(ev)=>{
+            getUserContractList()
+          }}>
+          <Text style={styles.txtbuttton}>Search</Text>
+        </Pressable>
+      </View>
+
           
-      <View style={styles.middlecontainer}>
+      <View style={styles.lowercontainer}>
       <FlatList
             data={userContracts}
-            renderItem={({item}) => <UserContractItem _id={item._id} ownerid={item.ownerid} city={item.city} country={item.country} mapid={item.mapid} alertid={item.alertid}  />}
+            renderItem={({item}) => <UserContractItem 
+                  _id={item._id} 
+                  name={item.name}
+                  ownerid={item.ownerid} 
+                  city={item.city} 
+                  country={item.country} 
+                  mapid={item.mapid} 
+                  alertid={item.alertid}  
+                  nav={navigation}/>}
           
             keyExtractor={item => item._id}
           ></FlatList>
-      </View>      
-        
+      </View>
       </View>
     );
   }
@@ -116,8 +123,6 @@ const Explore = ({route,navigation}:ExploreProps) => {
   const styles = StyleSheet.create({
     screen: {
       flexDirection:'column',
-      justifyContent: 'center',
-      alignItems: 'center',
       backgroundColor:'white',
       height:'100%',
         width:'100%',
@@ -132,25 +137,6 @@ const Explore = ({route,navigation}:ExploreProps) => {
       borderWidth:2,
       padding:6
     },
-    inputbox:{
-        flex:3,
-        width:'100%',
-        color:'white',
-        backgroundColor:'black',
-        borderBottomWidth:2,
-        borderLeftWidth:2,
-        borderRightWidth:2,
-        borderColor:'white',
-        fontSize:16
-    },
-    inputbutton:{
-        flex:1,
-        borderLeftWidth:2,
-        color:'white',
-        backgroundColor:'black',
-        borderColor:'white',
-        fontSize:12
-    },
     items:{
       width:'100%',
       height:'100%',
@@ -163,58 +149,59 @@ const Explore = ({route,navigation}:ExploreProps) => {
       width:'100%',
       height:'100%',
       backgroundColor:'black',
-      justifyContent:'center'
+      justifyContent:'flex-start'
     },
-    passcontainer:{
+    inputcontainer:{
       backgroundColor:'white',
-        
-        flexDirection:'row',
-        height:'20%',
-        width:'100%',
+      flex:1,
+      flexDirection:'row',
+      height:'100%',
+      width:'100%',
+      marginTop:5,
+      borderWidth:1,
+      borderColor:'black'
     },
-    middlecontainer:{
+    lowercontainer:{
        backgroundColor:'white',
        height:'100%',
         width:'100%',
-        flex: 8
-    },
-    lowercontainer:{
-      height:'100%',
-       width:'100%',
-       flex: 1,
-       flexDirection:'column'
-   },
-   inputC:{
-    flex:1,
-    width:'100%',
-    backgroundColor:'black',
-    color:'white',
-    fontSize:10,
-    textAlignVertical:'center',
-    textAlign:'center',
-    padding:5,
-    borderLeftColor:'white',
-    borderLeftWidth:2
-  },
-    inputB:{
-      flex:5,
-      backgroundColor:'black',
-      color:'white',
-      fontSize:20
+        flex: 14
     },inputA:{
-      fontSize:15
+      textAlign:'left',
+      textAlignVertical:'center',
+      fontSize:13,
+      color:'white'
     },
+    inputB:{
+      flex:4,
+      width:'100%',
+      paddingLeft:4
+    },inputC:{
+      textAlign:'left',
+      textAlignVertical:'center',
+      fontSize:13,
+    },
+
     button:{
       backgroundColor:'grey',
       height:'50%',
       flex:1,
     },
     textbutton:{
+      flex:2,
+      
+    },
+    txtbuttton:{
+      textAlign:'center',
+      textAlignVertical:'center',
       width:'100%',
       height:'100%',
       backgroundColor:'black',
       fontSize:16,
-      color:'white'
+      color:'white',
+      borderLeftWidth:2,
+      borderRightWidth:2,
+      borderColor:'white'
     }
     
   });

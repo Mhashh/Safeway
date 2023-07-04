@@ -34,11 +34,6 @@ function App(): JSX.Element {
   const [errorMsg, setErrorMsg] = React.useState<String>();
 
   
-
- 
-  
-
-
   React.useEffect(() => {
     
     (async () => {
