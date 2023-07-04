@@ -21,7 +21,7 @@ contract RoadAlert{
     constructor(uint256 _amount_per_hit,uint256 _viewcost) {
         owner = msg.sender;
         amount_per_hit = _amount_per_hit;        
-        viewcost=_viewcost*(10**18);
+        viewcost=_viewcost;
     }
 
     //
