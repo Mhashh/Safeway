@@ -173,7 +173,7 @@ export default function Login({route,navigation}:LoginProps){
                         setLoading(false)
                     }
                     }><Text style={styles.textbutton}>{loginType ==true?"Enter keys ":"Create keys"}</Text></Pressable>
-                <Pressable onPress={()=>setPageType(!loginType)}><Text style={styles.alternatebutton}>{loginType==true?"Create new keys ?":"Already have etherum 12 word phrase?"}</Text></Pressable>
+                <Pressable onPress={()=>setPageType(!loginType)}><Text style={styles.alternatebutton}>{loginType==true?"Create new keys ?":"Already have ethereum 12 word phrase?"}</Text></Pressable>
                 </View>
             }
         </View>
