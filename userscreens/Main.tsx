@@ -20,6 +20,7 @@ import { apiGetC, getBalance, uri } from '../helpers/DevClient';
 type MainProps = NativeStackScreenProps<RootStackParamList, 'Main'>
 type UserContractList = {
   _id:string,
+  name:string,
   ownerid:string,
   city:string,
   country:string,
@@ -28,16 +29,18 @@ type UserContractList = {
   nav:NativeStackNavigationProp<RootStackParamList, "Main", undefined>,
 }
 
-const UserContractItem = ({_id,ownerid,city,country,alertid,mapid,nav}: UserContractList) => (
+const UserContractItem = ({_id,name,ownerid,city,country,alertid,mapid,nav}: UserContractList) => (
   <Pressable style={styles.usercontract} onPress={(ev)=>{
       nav.navigate("MapShowContract",{
+        name:name,
         mapid:mapid,
         alertid:alertid,
         city:city,
+        ownerid:ownerid
       });
     }
   }>
-    <Text style={styles.items}>{mapid} {alertid} {city} { country}</Text>
+    <Text style={styles.items}>{name}{'\n'}<Text style={styles.inputA}>{mapid}{'\n'}{city},{ country}</Text></Text>
   </Pressable>
 );
 const MainDisplay = ({route,navigation}:MainProps) => {
@@ -76,7 +79,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
     return (
       <View style={styles.screen} ><View style={styles.topbar}>
           <Text style={styles.inputB}>
-            Balance : {balance}{'\n'}<Text style={styles.inputA}>Address: {userAddress}</Text> 
+            <Text style={styles.inputA}>{userAddress}{'\n'}Balance:{balance}</Text> 
           </Text>
           <Pressable onPress={(ev)=>{
             getUserContractList().then().catch((err)=>{console.log(err)})
@@ -93,6 +96,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
             data={userContracts}
             renderItem={({item}) => <UserContractItem 
                   _id={item._id} 
+                  name={item.name}
                   ownerid={item.ownerid} 
                   city={item.city} 
                   country={item.country} 
@@ -155,7 +159,7 @@ const MainDisplay = ({route,navigation}:MainProps) => {
        backgroundColor:'white',
        height:'100%',
         width:'100%',
-        flex: 9
+        flex: 16
     },
     lowercontainer:{
        flex: 1,
@@ -177,7 +181,8 @@ const MainDisplay = ({route,navigation}:MainProps) => {
       flex:5,
       backgroundColor:'black',
       color:'white',
-      fontSize:20
+      fontSize:20,
+      textAlignVertical:'center'
     },inputA:{
       fontSize:12
     },
@@ -192,10 +197,11 @@ const MainDisplay = ({route,navigation}:MainProps) => {
     },
     txtbuttton:{
       textAlign:'center',
+      textAlignVertical:'center',
       width:'100%',
       height:'100%',
       backgroundColor:'black',
-      fontSize:16,
+      fontSize:13,
       color:'white',
       borderLeftWidth:2,
       borderRightWidth:2,
