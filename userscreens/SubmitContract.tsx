@@ -1,6 +1,6 @@
 import React from 'react';
 import MapView, { LatLng, Marker, Polygon, Region } from 'react-native-maps';
-import { Pressable, StyleSheet, View,Text, TextInput } from 'react-native';
+import { Pressable, StyleSheet, View,Text, TextInput, Alert } from 'react-native';
 import { AuthContext, RootStackParamList } from '../helpers/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createNewContract,mainContractCost} from '../helpers/CallContracts';
@@ -10,6 +10,29 @@ import { addToPolygon } from '../helpers/CallUserContracts';
 import { ethers,BigNumber } from 'ethers';
 
 type SubmitContractProps = NativeStackScreenProps<RootStackParamList,"SubmitContract">
+
+//dialog box before any query showing cost
+const showAlert = (header:string,detail:string) : Promise<boolean>=>{
+  return new Promise((resolve,reject)=>{
+      Alert.alert(
+          header,
+          detail,
+          [
+            {
+              text: 'ok',
+              onPress: () =>{
+                  
+                  resolve(true)
+                  },
+              style: 'default',
+          }
+          ],
+          {
+          cancelable: true,
+          },
+      );}
+  )
+}
 
 export default function SubmitContract({route,navigation}:SubmitContractProps) {
 
@@ -22,21 +45,24 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
   const [d,setInputd] = React.useState<string>("")
   const [e,setInpute] = React.useState<string>("")
 
-  const addPol = async(contractid)=>{
-    polygon.forEach(async (value,i)=>{
-      const success = await addToPolygon(contractid,value.longitude*1000000,value.latitude*1000000,userclient);;
+  const addPol = async(contractid:string)=>{
+    for(let i = 0;i<polygon.length;i++){
+      let success = await addToPolygon(contractid,polygon[i].longitude,polygon[i].latitude,userclient);
 
       if(success){
         console.log(true)
       }
-    })
+    }
   }
 
   const addCon = async()=>{
     //cost to dev
     const cost = await mainContractCost(userclient);
     console.log(a+" "+c+" "+cost);
-    const res = await createNewContract(BigNumber.from(a),cost,BigNumber.from(c),userclient);
+    const vcost = Number.parseFloat(a)*100;
+    const acost = Number.parseFloat(c)*100;
+    const power = BigNumber.from("10000000000000000")//10^16
+    const res = await createNewContract(power.mul(vcost),cost,power.mul(acost),userclient);
 
     console.log(res);
     //success
@@ -62,6 +88,11 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
       navigation.reset({
         routes: [{ name: 'Main', params: {  } },]
       })
+    }else{
+      await showAlert("Contract creation failed","transaction reverted.");
+       navigation.reset({
+        routes: [{ name: 'Main', params: {  } },]
+      })
     }
   }
   React.useEffect(
@@ -75,8 +106,8 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
     <View style={styles.container}>
            
       <View style={styles.inputs}>
-            <TextInput keyboardType='numeric' style={styles.input} placeholder='View cost(wei)' onChangeText={(newtext)=>setInputa(newtext)} value={a}/>
-            <TextInput keyboardType='numeric' style={styles.input} placeholder='Hit cost(wei)' onChangeText={(newtext)=>setInputc(newtext)} value={c}/>
+            <TextInput keyboardType='numeric' style={styles.input} placeholder='View cost(dollar)' onChangeText={(newtext)=>setInputa(newtext)} value={a}/>
+            <TextInput keyboardType='numeric' style={styles.input} placeholder='Hit cost(dollar)' onChangeText={(newtext)=>setInputc(newtext)} value={c}/>
             <TextInput style={styles.input} placeholder='Nickname' onChangeText={(newtext)=>setInputb(newtext)} value={b}/>
             <TextInput style={styles.input} placeholder='City' onChangeText={(newtext)=>setInputd(newtext)} value={d}/>
             <TextInput style={styles.input} placeholder='Country' onChangeText={(newtext)=>setInpute(newtext)} value={e}/>
