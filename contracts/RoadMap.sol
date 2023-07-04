@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 contract RoadMap{
     
     address dev = 0xEd4Ba4D1b51A33aDb6ad579a9A6AceFfa889bff2;
+    address price = 0x1351ae85D96624D76e7cCd092c102268a4c9a844;
     address public owner;
     address alert;
     int32[10] public polygonLong;
@@ -12,7 +13,6 @@ contract RoadMap{
     int8[50] public report;
     uint public hits = 0;
     mapping(address => uint) viewer;
-    uint256 public balance=0;
 
     receive() external payable {
 
@@ -23,8 +23,15 @@ contract RoadMap{
         require(success,"no rate");
         
         (uint256 rate) = abi.decode(result,(uint256));
-        require(rate == msg.value,"value wrong");
-        payable(dev).transfer(rate);
+        (bool success2,bytes memory result2) = price.call(abi.encodeWithSignature("getData()"));
+
+        require(success2,"unable to convert");
+        (,int256 answer, ,) = abi.decode(result2,(uint,int256,uint80,uint8));
+
+        //usd * 10^18
+        uint256 doll = ((msg.value/(10**9))*uint256(answer*(10**10)))/(10**9);
+        require(rate <= doll,"value less");
+        payable(dev).transfer((rate/uint256(answer))*10**8);
         owner = msg.sender;
     }
 
@@ -60,13 +67,10 @@ contract RoadMap{
         require(owner == msg.sender);
         alert = _alert;
     }
-    function addFund() external payable{
-        balance += msg.value;
-    }
 
-    function withdraw() external payable {
+    function withdraw() external {
         require(owner == msg.sender);
-        payable(owner).transfer(balance);
+        payable(owner).transfer(address(this).balance);
     }
 
     function changeOwner(address newowner) external{

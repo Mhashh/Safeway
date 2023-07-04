@@ -4,16 +4,15 @@ pragma solidity ^0.8.0;
 
 contract RoadAlert{
     address dev = 0xEd4Ba4D1b51A33aDb6ad579a9A6AceFfa889bff2;
-                  
-    uint256 amount_per_hit;
+    address price = 0x1351ae85D96624D76e7cCd092c102268a4c9a844;         
+    uint256 amount_per_hit;//dollar*10^18
     uint public hits = 0;
     address owner;
     mapping(address => uint) viewer;
-    uint256 balance;
     int32[50] longitude;
     int32[50] latitude;
     
-    uint256 public viewcost;
+    uint256 public viewcost;//dollar*10^18
 
     receive() external payable {
 
@@ -21,15 +20,15 @@ contract RoadAlert{
 
     constructor(uint256 _amount_per_hit,uint256 _viewcost) {
         owner = msg.sender;
-        amount_per_hit = _amount_per_hit;        
-        viewcost=_viewcost;
+        amount_per_hit = _amount_per_hit*(10**18);        
+        viewcost=_viewcost*(10**18);
     }
 
     //
 
     //contributors
     function detected(int32 long,int32 lat) external {
-        require(msg.sender == owner ||  (amount_per_hit > 0 &&  balance >= amount_per_hit ),"Cant pay");
+
         require((hits<100)&&(long<=180000000 && long>=-90000000 && lat<=180000000 && lat>=-90000000));
         //checking nearby detected points ~ > 10m distance
         for(uint i = 0;i<hits;i++){
@@ -37,8 +36,12 @@ contract RoadAlert{
                         
         }
         if(msg.sender != owner){
-            payable(msg.sender).transfer(amount_per_hit);
-            balance= balance - amount_per_hit;
+             (bool success2,bytes memory result2) = price.call(abi.encodeWithSignature("getData()"));
+
+            require(success2,"unable to convert");
+            (,int256 answer, ,) = abi.decode(result2,(uint,int256,uint80,uint8));
+
+            payable(msg.sender).transfer((amount_per_hit/uint256(answer))*10**8);
         }
         
         
@@ -80,11 +83,7 @@ contract RoadAlert{
         return(longitude[index],latitude[index]);
     }
 
-    function addFund() external payable{
-        balance += msg.value;
-    }
-
-    function withdraw() external payable {
+    function withdraw() external {
         require(owner == msg.sender);
         payable(owner).transfer(address(this).balance);
     }
@@ -95,7 +94,7 @@ contract RoadAlert{
     
     function updateViewCost(uint256 _viewcost) external{
         require(owner == msg.sender);
-        viewcost=_viewcost;
+        viewcost=(_viewcost*(10**18));
     }
 
 }
