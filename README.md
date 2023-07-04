@@ -1,2 +1,8 @@
-there is a problem with atob,btoa in encoding library(hashgraph,etherprohect), this change fixes the issue
-https://github.com/ethers-io/ethers.js/issues/3460#issuecomment-1288202217
+"""Safeway"""
+A decentralized app to sell map regions and display road alerts. The alert data can be submitted by owner or collected via acceleraion sensor kept at a fixed config in a moving vehicle.
+How to run locally:
+-clone the repo.
+-yarn expo install
+-yarn expo start -c
+-a qr code screen will be generated
+-install expo go app on android phone and scan the qr code to run in development mode.
