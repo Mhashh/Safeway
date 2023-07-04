@@ -20,7 +20,7 @@ contract RoadAlert{
 
     constructor(uint256 _amount_per_hit,uint256 _viewcost) {
         owner = msg.sender;
-        amount_per_hit = _amount_per_hit*(10**18);        
+        amount_per_hit = _amount_per_hit;        
         viewcost=_viewcost*(10**18);
     }
 
@@ -94,7 +94,7 @@ contract RoadAlert{
     
     function updateViewCost(uint256 _viewcost) external{
         require(owner == msg.sender);
-        viewcost=(_viewcost*(10**18));
+        viewcost=_viewcost;
     }
 
 }

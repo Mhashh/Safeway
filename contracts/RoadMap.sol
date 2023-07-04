@@ -7,7 +7,7 @@ contract RoadMap{
     address dev = 0xEd4Ba4D1b51A33aDb6ad579a9A6AceFfa889bff2;
     address price = 0x1351ae85D96624D76e7cCd092c102268a4c9a844;
     address public owner;
-    address alert;
+    address public alert;
     int32[10] public polygonLong;
     int32[10] public polygonLat;
     int8[50] public report;
@@ -26,12 +26,12 @@ contract RoadMap{
         (bool success2,bytes memory result2) = price.call(abi.encodeWithSignature("getData()"));
 
         require(success2,"unable to convert");
-        (,int256 answer, ,) = abi.decode(result2,(uint,int256,uint80,uint8));
+        (,int256 answer, ,uint8 dec) = abi.decode(result2,(uint,int256,uint80,uint8));
 
         //usd * 10^18
-        uint256 doll = ((msg.value/(10**9))*uint256(answer*(10**10)))/(10**9);
+        uint256 doll = ((msg.value/(10**9))*uint256(answer*int256(10**(18-dec))))/(10**9);
         require(rate <= doll,"value less");
-        payable(dev).transfer((rate/uint256(answer))*10**8);
+        payable(dev).transfer((rate/uint256(answer))*10**dec);
         owner = msg.sender;
     }
 
