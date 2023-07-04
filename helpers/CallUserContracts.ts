@@ -40,7 +40,7 @@ const showAlert = (header:string,detail:string) : Promise<boolean>=>{
             {
                 text: 'Pay',
                 onPress: () =>{
-                    Alert.alert('Transaction proceeds..')
+                    Alert.alert('May take 2-3 mins..')
                     resolve(true)
                     },
                 style: 'default',
@@ -68,14 +68,16 @@ type Earned = {
 
 //alert
 export const viewcost = async(contractAddress:string,wallet:Wallet):Promise<BigNumber>=>{
-
+    console.log("view");
     //new contact
     const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,provider);
     try{
         const value = await contract.viewcost();
+        console.log(value);
         return value;
     }
     catch(err){
+        console.log(err)
         const errValue =  BigNumber.from(-1);
         return errValue;
     }
@@ -97,14 +99,16 @@ export const hits = async(contractAddress:string,wallet:Wallet):Promise<number>=
 
 // can be used for both map and alert count of map polygon or road alerts
 export const hitsA= async(contractAddress:string,wallet:Wallet):Promise<number>=>{
-
+    console.log("hitsA"+contractAddress);
     //new contact
     const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,provider);
     try{
         const value = await contract.hits();
+        console.log(value);
         return value;
     }
     catch(err){
+        console.log(err)
         return 0;
     }
 }
@@ -114,7 +118,7 @@ export const hitsA= async(contractAddress:string,wallet:Wallet):Promise<number>=
 export const detected = async(contractAddress:string,longitude:number,latitude:number,wallet:Wallet):Promise<boolean>=>{
 
     //new contact
-    const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,provider);
+    const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,wallet);
     try{
         let ln  = longitude*1000000;
         let lt = latitude*1000000;
@@ -123,8 +127,9 @@ export const detected = async(contractAddress:string,longitude:number,latitude:n
         const overrides={
             gasLimit:100000
         }
-        const tx:ethers.providers.TransactionResponse= await contract.addToPolygon(ln,lt,overrides);
+        const tx:ethers.providers.TransactionResponse= await contract.detected(ln,lt,overrides);
         const txR:ethers.providers.TransactionReceipt = await tx.wait();
+        console.log("detected : "+txR.status)
         if(txR.status==0){
             return false
         }
@@ -166,7 +171,7 @@ export const addToPolygon = async(contractAddress:string,longitude:number,latitu
 
 //view polygon 
 export const polygon = async(contractAddress:string,index:number,wallet:Wallet):Promise<LatLng|undefined>=>{
-
+    
      //new contact
      const contract = new  ethers.Contract(contractAddress,mapContractCompile.abi,provider);
      try{
@@ -190,15 +195,15 @@ export const polygon = async(contractAddress:string,index:number,wallet:Wallet):
 export const getMarker = async(contractAddress:string,index:number,wallet:Wallet):Promise<LatLng|undefined>=>{
 
     //new contact
-    const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,provider);
+    const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,wallet);
     try{
         const res= await contract.getMarker(index);
-        if(res.longitude !== undefined){
+       console.log(res)
            return{
-               longitude:res[0],
-               latitude:res[1]
+               longitude:res[0]/1000000,
+               latitude:res[1]/1000000
            }
-        }
+        
     }
     catch(err){
        console.log(err)
@@ -211,16 +216,37 @@ export const getMarker = async(contractAddress:string,index:number,wallet:Wallet
 
 //view alert points  payment by user other than owner
 export const viewMarkers = async(contractAddress:string,price:BigNumber,wallet:Wallet):Promise<boolean>=>{
-
-    //new contact
-    const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,wallet);
     try{
+        const key = Constants.expoConfig.extra.API
+        //dollar to eth value
+        const webres = await fetch("https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=ETH"+"&api_key="+key, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        }
+        })
+        const res:{ETH:number}= await webres.json();
+
+        let dollars;
+        const power = BigNumber.from("1000000000000000000")
+        if(price.lt(power)){
+            const exp = power.div(price).toNumber();
+            dollars = 1/exp;
+        }else{
+            const exp = price.div(power).toNumber();
+            dollars =  exp;
+        }
+        const ethamt = dollars*res.ETH;
+        //new contact
+        const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,wallet);
+    
         const overrides={
-            value:price,
+            value:ethers.utils.parseEther(ethamt.toString()),
             gasLimit:100000
         }
 
-        const accept =  await showAlert("Subscribing for one day to view  hits","Estimated cost : "+(overrides.value)+"  wei, Pay?");
+        const accept =  await showAlert("Subscribing for one day to view  hits","Estimated cost : "+dollars+"  dollars, Pay?");
         if(accept){
             const tx:ethers.providers.TransactionResponse= await contract.viewMarkers(overrides);
             const txR:ethers.providers.TransactionReceipt = await tx.wait();
@@ -241,13 +267,13 @@ export const viewMarkers = async(contractAddress:string,price:BigNumber,wallet:W
 export const viewMarker = async(contractAddress:string, index :number,wallet:Wallet):Promise<LatLng|undefined>=>{
 
     //new contact
-    const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,provider);
+    const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,wallet);
     try{
         const res= await contract.viewMarker(index);
         if(res.longitude !== undefined){
            return{
-               longitude:res[0],
-               latitude:res[1]
+               longitude:res[0]/1000000,
+               latitude:res[1]/1000000
            }
         }
     }
@@ -311,7 +337,7 @@ export const addFund = async(contractAddress:string,amount:string,wallet:Wallet)
     
     try{
 
-        const accept =  await showAlert("Withdraw","Withdrawing will remove the current contract, continue ?");
+        const accept =  await showAlert("Add amount "+amount+"eth"," continue ?");
         if(accept){
             const tx={
                 to:contractAddress,

@@ -78,7 +78,7 @@ const showAlert = (header:string,detail:string) : Promise<boolean>=>{
             {
                 text: 'Pay',
                 onPress: () =>{
-                    Alert.alert('You will be automatically sent back to Main After successful creation!!')
+                    Alert.alert('You will be automatically sent back(2-3 mins) after successful creation!!')
                     resolve(true)
                     },
                 style: 'default',
@@ -117,7 +117,7 @@ export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
         'Content-Type': 'application/json'
       }
     })
-    const res= await webres.json();
+    const res:{ETH:number}= await webres.json();
 
     let dollars;
     const power = BigNumber.from("1000000000000000000")
@@ -145,7 +145,6 @@ export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
             const txReceipt:ethers.ContractReceipt= await contract.deployTransaction.wait();
             
             if(txReceipt.status == 1){
-                console.log(txReceipt.contractAddress)
                 return{
                     status:true,
                     contractaddress:txReceipt.contractAddress,
@@ -155,7 +154,6 @@ export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
         }
     }
     catch(err){
-        console.log("addNewMap : "+err)
         return{
             status:false,
             contractaddress:undefined,
@@ -182,7 +180,6 @@ export const addNewAlert = async(amount_per_hit:BigNumber,viewcost:BigNumber,wal
         const txReceipt:ethers.ContractReceipt= await contract.deployTransaction.wait();
         
         if(txReceipt.status == 1){
-            console.log(txReceipt.contractAddress)
             return{
                 status:true,
                 contractaddress:txReceipt.contractAddress,
@@ -192,7 +189,7 @@ export const addNewAlert = async(amount_per_hit:BigNumber,viewcost:BigNumber,wal
         
     }
     catch(err){
-        console.log(err)
+        
         return{
             status:false,
             contractaddress:undefined,
@@ -223,7 +220,7 @@ export const connectMapandAlert = async(mapcontractaddress:string,alertaddress:s
         }
     }
     catch(err){
-        console.log(err)
+        
         return error1;
     }
     return error2;
@@ -271,7 +268,6 @@ export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount
                 else{
                     const mapID = response.contractaddress;
                     const alertID = secondresponse.contractaddress;
-                    console.log("IDS : "+mapID+"  : "+alertID)
                     return{
                         status:true,
                         mapid:mapID,
@@ -285,7 +281,7 @@ export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount
 
     }
     catch(err){
-        console.log(err)
+        
         return{
             status:false,
             mapid:undefined,
