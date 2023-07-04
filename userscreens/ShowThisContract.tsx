@@ -1,6 +1,6 @@
 import React from 'react';
 import MapView, { Camera, LatLng, Marker, Polygon, Region } from 'react-native-maps';
-import { StyleSheet, View,Text, Pressable } from 'react-native';
+import { StyleSheet, View,Text, Pressable, Alert } from 'react-native';
 import { AuthContext, RootStackParamList } from '../helpers/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getMarker, hits, hitsA, polygon, viewMarker, viewMarkers, viewcost } from '../helpers/CallUserContracts';
@@ -86,9 +86,11 @@ export default function ShowThisContract({route,navigation}:MapShowContractProps
           //can't get ith coordinate "not subscribed" show payment prompt
           const paid = await viewMarkers(alertid,price,userclient);
           if(paid){
+            Alert.alert("Payment success");
             i--;
           }
           else{
+            Alert.alert("Payment failed");
             break;
           }
         }
