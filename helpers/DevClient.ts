@@ -50,7 +50,8 @@ type getpResponse = {
 
 
 export const createNewAccount =  () : NewAccount =>{
-    const wallet = Wallet.createRandom();
+    let wallet = Wallet.createRandom();
+    wallet = wallet.connect(provider);
     return{
         wallet:wallet,
         memonic:wallet.mnemonic.phrase,

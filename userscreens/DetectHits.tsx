@@ -197,12 +197,18 @@ export default function DetectHits({route,navigation}:DetectHitsProps) {
              
              if(gps!==undefined && polygonInside()){
               _unsubscribe();
-               showAlert("Road issue detected","submit?").then(()=>{
-                 detected(contractid,gps.coords.longitude,gps.coords.latitude,userclient).then((res)=>{
-                   _subscribe()
-                 }).catch((err)=>{
-                   _subscribe()
-                 })
+               showAlert("Road issue detected","submit?").then((yep)=>{
+                if(yep){
+                  detected(contractid,gps.coords.longitude,gps.coords.latitude,userclient).then((res)=>{
+                    _subscribe()
+                  }).catch((err)=>{
+                    _subscribe()
+                  })
+                }
+                else{
+                  _subscribe()
+                }
+
                }).catch((err)=>{
                  _subscribe();
                })

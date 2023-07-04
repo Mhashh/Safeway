@@ -62,6 +62,7 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
     const vcost = Number.parseFloat(a)*100;
     const acost = Number.parseFloat(c)*100;
     const power = BigNumber.from("10000000000000000")//10^16
+
     const res = await createNewContract(power.mul(vcost),cost,power.mul(acost),userclient);
 
     console.log(res);

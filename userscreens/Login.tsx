@@ -20,18 +20,18 @@ export default function Login({route,navigation}:LoginProps){
     const [tempWallet,setWallet] = React.useState<Wallet>();
     //12 word key string states
 
-    const[a,setA] = React.useState<string>("interest")
-    const[b,setB] = React.useState<string>("invite")
-    const[c,setC] = React.useState<string>("solution")
-    const[d,setD] = React.useState<string>("own")
-    const[e,setE] = React.useState<string>("box")
-    const[f,setF] = React.useState<string>("fetch")
-    const[g,setG] = React.useState<string>("crouch")
-    const[h,setH] = React.useState<string>("fossil")
-    const[i,setI] = React.useState<string>("region")
-    const[j,setJ] = React.useState<string>("smile")
-    const[k,setK] = React.useState<string>("calm")
-    const[l,setL] = React.useState<string>("rhythm")
+    const[a,setA] = React.useState<string>("excess")
+    const[b,setB] = React.useState<string>("avocado")
+    const[c,setC] = React.useState<string>("icon")
+    const[d,setD] = React.useState<string>("wall")
+    const[e,setE] = React.useState<string>("obey")
+    const[f,setF] = React.useState<string>("medal")
+    const[g,setG] = React.useState<string>("jealous")
+    const[h,setH] = React.useState<string>("cluster")
+    const[i,setI] = React.useState<string>("prefer")
+    const[j,setJ] = React.useState<string>("entry")
+    const[k,setK] = React.useState<string>("ginger")
+    const[l,setL] = React.useState<string>("pottery")
 
     const newUser = ()=>{
         const account = createNewAccount();

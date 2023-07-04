@@ -57,7 +57,9 @@ export default function ShowThisContract({route,navigation}:MapShowContractProps
   const getHits = async()=>{
     const noofpoints = await hitsA(alertid,userclient);
     const price = await viewcost(alertid,userclient);
-    console.log(price+"   "+noofpoints);
+    console.log("getHits"+price.toString()+"   "+noofpoints);
+
+    //owners
     if(ownerid === userAddress){
       let ans : LatLng[]= []
       for(let i = 0;i<noofpoints;i++){
@@ -68,12 +70,14 @@ export default function ShowThisContract({route,navigation}:MapShowContractProps
       }
       setPoints(ans);
     }
+
+    //someone elses
     else{
       let ans : LatLng[]= []
       for(let i = 0;i<noofpoints;i++){
         //get ith coordinate
         const coord = await viewMarker(alertid,i,userclient);
-
+        console.log(coord)
         
         if(coord!== undefined){
           ans.push(coord)
