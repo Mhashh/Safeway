@@ -18,6 +18,7 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
   const {polygon} = route.params
   const [a,setInputa] = React.useState<string>("")
   const [c,setInputc] = React.useState<string>("")
+  const [b,setInputb] = React.useState<string>("")
   const [d,setInputd] = React.useState<string>("")
   const [e,setInpute] = React.useState<string>("")
 
@@ -48,6 +49,7 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          name:b,
           mid:res.mapid,
           aid:res.alertid,
           owner:userAddress,
@@ -75,7 +77,7 @@ export default function SubmitContract({route,navigation}:SubmitContractProps) {
       <View style={styles.inputs}>
             <TextInput keyboardType='numeric' style={styles.input} placeholder='View cost(wei)' onChangeText={(newtext)=>setInputa(newtext)} value={a}/>
             <TextInput keyboardType='numeric' style={styles.input} placeholder='Hit cost(wei)' onChangeText={(newtext)=>setInputc(newtext)} value={c}/>
-          
+            <TextInput style={styles.input} placeholder='Nickname' onChangeText={(newtext)=>setInputb(newtext)} value={b}/>
             <TextInput style={styles.input} placeholder='City' onChangeText={(newtext)=>setInputd(newtext)} value={d}/>
             <TextInput style={styles.input} placeholder='Country' onChangeText={(newtext)=>setInpute(newtext)} value={e}/>
           
