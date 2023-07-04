@@ -11,7 +11,7 @@ import { ethers,BigNumber } from 'ethers';
 
 type SubmitContractProps = NativeStackScreenProps<RootStackParamList,"SubmitContract">
 
-//dialog box before any query showing cost
+//dialog box 
 const showAlert = (header:string,detail:string) : Promise<boolean>=>{
   return new Promise((resolve,reject)=>{
       Alert.alert(

@@ -12,7 +12,7 @@ console.log("HERE!!")
 // create your client
 
 //our app server link
-export const uri = `http://${Constants.manifest.debuggerHost.split(':').shift()}:3333`;
+export const uri = `http://${Constants.expoConfig.extra.URL}`;
 export const apiGetP = "/getP"
 export const apiGetC="/getContracts"
 export const apiGetCC="/getContractsCC"
@@ -73,11 +73,11 @@ export const getBalance =async (address:string):Promise<string> => {
 }
 
 //uses 12 word string as input 
-export const getAccountClientM = (memonic:string) : Wallet =>{
+export const getAccountClientM = async(memonic:string) : Promise<Wallet> =>{
 
        let wallet = Wallet.fromMnemonic(memonic);
        wallet = wallet.connect(provider);
-    
+      console.log("middle")
        return wallet;
     
 }
