@@ -34,7 +34,6 @@ export default function Login({route,navigation}:LoginProps){
     const[l,setL] = React.useState<string>("rhythm")
 
     const newUser = ()=>{
-        setLoading(true);
         const account = createNewAccount();
 
 
@@ -55,23 +54,22 @@ export default function Login({route,navigation}:LoginProps){
         setAddr(account.address)
         setWallet(account.wallet)//temporary , to wait so user can notedown memonic, there a button willset client
         setCreateFlag(true);
-        setLoading(false);
         console.log(account.address);
         
     }
-    const oldUser = () =>{
+    const oldUser = async() =>{
         let wordString = a+" "+b+" "+c+" "+d+" "+e+" "+f+" "+g+" "+h+" "+i+" "+j+" "+k+" "+l
-        setLoading(true);
-        const wallet = getAccountClientM(wordString);
+        
+        const wallet = await getAccountClientM(wordString);
+        console.log("no")
         setAddr(wallet.address);
-        setLoading(false);
         setClient(wallet);
     }
 
 
     return(
         <View style={styles.outerbox}>
-            {loading&&<ActivityIndicator/>}
+            {loading&&<ActivityIndicator size="large"/>}
             {(!loading)&&(created||loginType)&&<View style={styles.upperbox}><View style={styles.textbox}>
                         <TextInput style={styles.inputbox}
                             placeholder="12 word key"
@@ -163,7 +161,18 @@ export default function Login({route,navigation}:LoginProps){
                         
                     }}><Text style={styles.textbutton}>{"Store the words and then press here!"}</Text></Pressable></View>
                 :<View style={styles.buttons}>
-                <Pressable onPress={loginType?oldUser:newUser}><Text style={styles.textbutton}>{loginType ==true?"Enter keys ":"Create keys"}</Text></Pressable>
+                <Pressable onPress={()=>{
+                        setLoading(true);
+                        console.log("oh")
+                        if(loginType==true){
+                            oldUser();
+                        }
+                        else{
+                            newUser()
+                        }
+                        setLoading(false)
+                    }
+                    }><Text style={styles.textbutton}>{loginType ==true?"Enter keys ":"Create keys"}</Text></Pressable>
                 <Pressable onPress={()=>setPageType(!loginType)}><Text style={styles.alternatebutton}>{loginType==true?"Create new keys ?":"Already have etherum 12 word phrase?"}</Text></Pressable>
                 </View>
             }
