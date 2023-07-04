@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View,Text, TextInput } from 'react-native';
+import { Pressable, StyleSheet, View,Text, TextInput, Alert } from 'react-native';
 import { AuthContext, RootStackParamList } from '../helpers/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createNewContract,mainContractCost} from '../helpers/CallContracts';
@@ -27,11 +27,15 @@ export default function AddFund({route,navigation}:AddFundProps) {
         'Content-Type': 'application/json'
       }
     })
-    const res= await webres.json();
+    const res:{ETH:number}= await webres.json();
     if(res.ETH !== undefined){
-      const amount = Number.parseFloat(a)*(res.Eth);
-      const paid = await addFund(contractid,amount.toString(),userclient);
-      console.log(paid);
+      const dollar = Number.parseFloat(a);
+      const amount = dollar*res.ETH
+      const paid = await addFund(contractid,amount.toFixed(10),userclient);
+      if(paid)
+        Alert.alert("Payment done.")
+      else
+        Alert.alert("Payment failed.")
     }
     
   }
