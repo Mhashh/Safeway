@@ -78,7 +78,7 @@ const showAlert = (header:string,detail:string) : Promise<boolean>=>{
             {
                 text: 'Pay',
                 onPress: () =>{
-                    Alert.alert('Transaction proceeds..')
+                    Alert.alert('You will be automatically sent back to Main After successful creation!!')
                     resolve(true)
                     },
                 style: 'default',
@@ -108,14 +108,35 @@ export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
 
 //add new map region
   export const addNewMap = async(price:BigNumber,wallet:Wallet):Promise<AddResponse>=>{
-    
+    const key = Constants.expoConfig.extra.API
+    //dollar to eth value
+    const webres = await fetch("https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=ETH"+"&api_key="+key, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    const res= await webres.json();
+
+    let dollars;
+    const power = BigNumber.from("1000000000000000000")
+    if(price.lt(power)){
+        const exp = power.div(price).toNumber();
+        dollars = 1/exp;
+    }else{
+        const exp = price.div(power).toNumber();
+        dollars =  exp;
+    }
+    const ethamt = dollars*res.ETH;
+    console.log(res.ETH+" "+dollars.toString()+ "   "+ethamt);
     const factory = createMapContractFactory(wallet);
     const overrides ={
-        value:price.toString()
+        value:ethers.utils.parseEther(ethamt.toString())
     }
     const transaction = factory.getDeployTransaction(overrides)
     const gasgasgas = await provider.estimateGas(transaction);
-    const accept =  await showAlert("Adding new map region","Estimated cost : "+(overrides.value)+" eth , twice or more"+gasgasgas+" gas ");
+    const accept =  await showAlert("Adding new map region","Estimated cost : "+(dollars)+" dollar , twice or more"+gasgasgas+" gas ");
     
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
     try{
@@ -212,7 +233,8 @@ export const connectMapandAlert = async(mapcontractaddress:string,alertaddress:s
 //create new contract
 //add new hit region
 export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount_per_hit:BigNumber,wallet:Wallet):Promise<CreateResponse>=>{
-    
+
+   
    console.log("createNewContract")
     
     //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
