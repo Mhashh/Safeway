@@ -180,7 +180,7 @@ export const getMarker = async(contractAddress:string,index:number,wallet:Wallet
 
 
 //view alert points  payment by user other than owner
-export const viewMarkers = async(contractAddress:string,price:number,wallet:Wallet):Promise<boolean>=>{
+export const viewMarkers = async(contractAddress:string,price:BigNumber,wallet:Wallet):Promise<boolean>=>{
 
     //new contact
     const contract = new  ethers.Contract(contractAddress,mapContractCompile.abi,provider);
@@ -189,12 +189,16 @@ export const viewMarkers = async(contractAddress:string,price:number,wallet:Wall
             value:price,
             gasLimit:100000
         }
-        const tx:ethers.providers.TransactionResponse= await contract.detected(overrides);
-        const txR:ethers.providers.TransactionReceipt = await tx.wait();
-        if(txR.status==0){
-            return false
+
+        const accept =  await showAlert("Subscribing for one day to view  hits","Estimated cost : "+(overrides.value)+"  wei, Pay?");
+        if(accept){
+            const tx:ethers.providers.TransactionResponse= await contract.detected(overrides);
+            const txR:ethers.providers.TransactionReceipt = await tx.wait();
+            if(txR.status==0){
+                return false
+            }
+            return true
         }
-        return true
     }
     catch(err){
         console.log(err)
@@ -204,12 +208,12 @@ export const viewMarkers = async(contractAddress:string,price:number,wallet:Wall
 
 
 //view  alert points for others
-export const viewMarker = async(contractAddress:string,wallet:Wallet):Promise<LatLng|undefined>=>{
+export const viewMarker = async(contractAddress:string, index :number,wallet:Wallet):Promise<LatLng|undefined>=>{
 
     //new contact
     const contract = new  ethers.Contract(contractAddress,alertContractCompile.abi,provider);
     try{
-        const res= await contract.viewMarker();
+        const res= await contract.viewMarker(index);
         if(res.longitude !== undefined){
            return{
                longitude:res[0],

@@ -251,7 +251,7 @@ export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount
                     const alertID = secondresponse.contractaddress;
                     console.log("IDS : "+mapID+"  : "+alertID)
                     return{
-                        status:false,
+                        status:true,
                         mapid:mapID,
                         alertid:alertID,
                         msg:"success"
