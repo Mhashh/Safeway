@@ -138,7 +138,7 @@ export const mainContractCost =async (wallet:Wallet):Promise<BigNumber> => {
     const gasgasgas = await provider.estimateGas(transaction);
     const accept =  await showAlert("Adding new map region","Estimated cost : "+(dollars)+" dollar , twice or more"+gasgasgas+" gas ");
     
-    //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
+    //Sign with the client operator private key to pay for the transaction and submit the query to a  network
     try{
         if(accept){
             const contract = await factory.deploy(overrides);
@@ -173,7 +173,7 @@ export const addNewAlert = async(amount_per_hit:BigNumber,viewcost:BigNumber,wal
     const factory = createAlertContractFactory(wallet);
     
     
-    //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
+    //Sign with the client operator private key to pay for the transaction and submit the query to a  network
     try{
             
         const contract = await factory.deploy(amount_per_hit,viewcost);
@@ -211,7 +211,7 @@ export const connectMapandAlert = async(mapcontractaddress:string,alertaddress:s
 
     
     
-    //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
+    //Sign with the client operator private key to pay for the transaction and submit the query to a  network
     try{
         let tx = await contract.addAlert(alertaddress);
         let txReceipt = await tx.wait();
@@ -234,7 +234,7 @@ export const createNewContract = async(viewcost:BigNumber,price:BigNumber,amount
    
    console.log("createNewContract")
     
-    //Sign with the client operator private key to pay for the transaction and submit the query to a Hedera network
+    //Sign with the client operator private key to pay for the transaction and submit the query to a  network
     try{
         const response = await  addNewMap(price,wallet)
         if(!response.status){
