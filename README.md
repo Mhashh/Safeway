@@ -19,4 +19,3 @@ Android apk available through this link [apk, currently working](https://expo.de
 ![screenshots](https://i.ibb.co/ScMsns2/Screenshot-20230705-053235.png) 
 ![screenshots](https://i.ibb.co/0Z98SjM/Screenshot-20230705-053224.png) 
 ![screenshots](https://i.ibb.co/hVRXWkC/Screenshot-20230705-053205.png) 
-![screenshots](https://i.ibb.co/0Q5kkMw/Screenshot-20230705-023806.png)
