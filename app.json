@@ -27,9 +27,9 @@
       "favicon": "./assets/favicon.png"
     },
     "extra":{
-      "mainContractAddress":"0xEd4Ba4D1b51A33aDb6ad579a9A6AceFfa889bff2",
-      "API":"b2aa3d90c39d9466acd2af51c62305c7dd9252dba793e97f9eb5c3dfd23a9771",
-      "URL":"165.227.176.13"
+      "mainContractAddress":"",
+      "API":"",
+      "URL":""
     }
   }
 }
